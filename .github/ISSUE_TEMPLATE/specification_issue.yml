@@ -1,0 +1,64 @@
+name: Specification issue
+description: Report an ambiguity, contradiction, or implementation mismatch.
+title: "spec: <short summary>"
+labels: ["specification", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for public specification issues. Report security flaws
+        privately through the repository's Security tab.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Issue type
+      options:
+        - Ambiguous wording
+        - Contradictory requirements
+        - Specification and fixture disagree
+        - Implementations disagree
+        - Missing behavior
+        - Documentation only
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Language version
+      placeholder: 0.2.0-draft
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Section or fixture
+      placeholder: spec/03-evaluation.md — Numeric for loops
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Quote only the minimum relevant text and explain the issue.
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Verified implementation behavior
+      description: List implementations and versions tested, commands, and results.
+    validations:
+      required: false
+
+  - type: textarea
+    id: resolution
+    attributes:
+      label: Suggested resolution
+      description: What rule or fixture would remove the ambiguity?
+    validations:
+      required: false

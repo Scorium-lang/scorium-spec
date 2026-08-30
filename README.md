@@ -1,39 +1,101 @@
-# scorium-spec
+# Scorium language specification
 
-**Status: draft skeleton. Nothing in this repository is normative yet.**
+[![CI](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml/badge.svg)](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml)
+[![Language version](https://img.shields.io/badge/language-0.2.0--draft-8EDDFF?style=flat-square)](./VERSION)
+[![Status](https://img.shields.io/badge/status-draft-8EDDFF?style=flat-square)](./CHANGELOG.md)
+[![Source Available](https://img.shields.io/badge/source-available-8EDDFF?style=flat-square)](./LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/Scorium-lang/scorium-spec?style=flat-square&logo=github)](https://github.com/Scorium-lang/scorium-spec/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/Scorium-lang/scorium-spec?style=flat-square&logo=github)](https://github.com/Scorium-lang/scorium-spec/issues)
 
-This repository will hold the versioned Scorium language specification: the
-document set that every native implementation (`scorium-rust`, `scorium-go`,
-`scorium-jvm`, `scorium-python`, `scorium-dotnet`, `scorium-js`) implements
-against, plus a shared conformance fixture corpus each implementation runs in
-CI.
+**Readable on the surface. Programmable when you need it.**
 
-Compatibility across implementations comes from this repository, not from
-shared source code. Implementations do not share a toolchain, dependencies,
-or a release schedule, and are not required to support a new spec version
-simultaneously — each one pins and reports the Scorium language version it
-supports.
+This repository is the implementation-independent specification for the
+Scorium configuration language. It defines the grammar, value semantics,
+evaluation rules, canonical formatting, diagnostics, sandbox requirements,
+and the shared conformance fixtures used by native implementations.
 
-`scorium-rust` (the current Rust codebase) remains the reference
-*implementation* while this spec is being written, but its source is not
-itself the specification. Where this spec and the reference implementation
-disagree once both exist, that is a bug in one of the two, to be resolved
-explicitly — not settled by fiat in either direction.
+When an implementation disagrees with this specification, the disagreement
+must be resolved explicitly. An implementation's source code does not
+silently override the language contract.
 
-## Layout
+```scor
+@base_port = 8000
 
-- `spec/` — the specification documents, one file per concern. See each
-  file's own status line; all are currently outlines, not finished text.
-- `conformance/` — versioned fixture corpus (`conformance/<version>/`).
-  Each implementation runs the fixtures under the spec version it claims to
-  support. See `conformance/README.md` for the proposed fixture format.
-- `VERSION` — the current draft spec version.
-- `CHANGELOG.md` — spec version history, once versions start shipping.
+server {
+    host = localhost
+    port = base_port + 80
+    timeout = 5s
+    enabled = true
+}
 
-## Non-goals right now
+for i = 1, 3 do
+    worker {
+        name = worker-$i
+        index = i
+    }
+end
+```
 
-- No normative grammar/semantics text is finalized.
-- No conformance fixtures have been written.
-- No decision has been made on the "portable compliance level" (native
-  language minus raw `script {}` Lua blocks) described in
-  `spec/07-conformance-levels.md` — it is a proposal, not a rule.
+## Current status
+
+The current language version is **`0.2.0-draft`**. Sections 1–6 are first
+full normative drafts grounded in the behavior of the Rust reference
+implementation and exercised by the TypeScript implementation. Section 0
+contains the settled design principle and remaining project-level questions.
+Section 7 is an unapproved proposal and is not part of the language contract.
+
+The repository currently contains **31 conformance fixtures** across values,
+evaluation, diagnostics, formatting, and sandbox behavior. Draft means the
+language can still change before 1.0; it does not mean the documents or
+fixtures are placeholders.
+
+## Specification
+
+- [Overview and design principle](./spec/00-overview.md)
+- [Lexical structure and grammar](./spec/01-lexical-and-grammar.md)
+- [Value semantics](./spec/02-value-semantics.md)
+- [Evaluation rules](./spec/03-evaluation.md)
+- [Canonical formatter behavior](./spec/04-formatter.md)
+- [Diagnostic model](./spec/05-diagnostics.md)
+- [Sandbox and security rules](./spec/06-sandbox-and-security.md)
+- [Conformance-level proposal](./spec/07-conformance-levels.md)
+
+## Conformance fixtures
+
+Fixtures live under `conformance/v<language-version>/`. Each implementation
+runs the directory matching the language version it claims to support. The
+fixture format uses tagged semantic values so integers, floating-point edge
+cases, repeated nodes, and formatter byte identity remain unambiguous across
+host languages.
+
+See [the conformance format](./conformance/README.md) before implementing a
+harness or contributing a fixture. Compatibility comes from these fixtures,
+not from implementations sharing source code or release schedules.
+
+## Implementations
+
+- [`scorium-rs`](https://github.com/Scorium-lang/scorium-rs) — Rust reference
+  implementation, including the Lua execution surface.
+- [`scorium-js`](https://github.com/Scorium-lang/scorium-js) — native
+  TypeScript/JavaScript implementation of the non-Lua language core.
+
+An implementation version and a language version are separate. For example,
+an implementation may release version `0.9.0` while declaring support for
+language version `0.2.0-draft`.
+
+## Repository layout
+
+- `spec/` — one specification document per language concern.
+- `conformance/` — fixture format and versioned fixture corpora.
+- `VERSION` — current draft language version.
+- `CHANGELOG.md` — language-version history.
+
+## Contributing and security
+
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) before proposing normative changes
+or fixtures. Report security-sensitive specification flaws privately as
+described in [SECURITY.md](./SECURITY.md).
+
+Scorium is source-available under PolyForm Strict 1.0.0; it is **not**
+OSI-approved open source. See [LICENSE](./LICENSE) and
+[COMMERCIAL.md](./COMMERCIAL.md).

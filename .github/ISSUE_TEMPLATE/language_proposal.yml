@@ -1,0 +1,62 @@
+name: Language proposal
+description: Propose a syntax, semantics, diagnostics, or conformance change.
+title: "proposal: <short summary>"
+labels: ["proposal", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Language changes affect every implementation. Show the user problem,
+        not only a preferred syntax, and account for migration and sandboxing.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What real configuration task is difficult or impossible today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include concise Scorium examples and observable results.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include the option of leaving the language unchanged.
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and migration
+      description: Explain parsing changes, old-file behavior, and implementation work.
+    validations:
+      required: true
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and resource limits
+      description: Explain sandbox, include, host-capability, and denial-of-service impact.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Design checks
+      options:
+        - label: This preserves Scorium's declarative-first configuration focus.
+          required: true
+        - label: This can be specified independently of Rust and JavaScript.
+          required: true
+        - label: I have not treated the Section 7 proposal as approved behavior.
+          required: true
