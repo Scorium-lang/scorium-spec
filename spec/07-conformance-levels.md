@@ -21,9 +21,9 @@ target language.
 
 Two conformance levels:
 
-- **Portable** -- the full native language (§1-4, §6 minus the Lua-specific
+- **Core** -- the full native language (§1-4, §6 minus the Lua-specific
   sandbox rules) with `script {}` unsupported.
-- **Full** -- Portable plus `script {}`, requiring an embedded Lua VM in the
+- **Full** -- Core plus `script {}`, requiring an embedded Lua VM in the
   implementation's own language runtime (e.g. a pure-Go Lua VM for
   `scorium-go`), explicitly still native -- never a wrapper around
   `scorium-rs`'s Lua integration.
@@ -33,13 +33,31 @@ The stable `0.2.0` rule already requires an implementation without Lua
 execution to raise `scorium::eval::script_error` when evaluation reaches a
 script block; it may not skip the block or treat it as inert (§1, §3, §5).
 
+If an implementation later adds Full-level support after shipping Core,
+that support SHOULD be an optional capability a consumer opts into (a
+separate package/module, a build feature, or equivalent), not something
+that becomes a dependency of the base Core package -- a consumer who only
+needs Core shouldn't have to carry a Lua VM to get it. This is packaging
+guidance for implementations, not a normative requirement of this
+still-informative section.
+
+## Current status (informative, not an approval)
+
+`scorium-js` has decided to stay at Core scope for now -- no `script {}`
+execution is planned there until there's real evidence it's worth adding.
+`scorium-go` is the designated vehicle for gathering that evidence: build
+it Core-only, run it against a real consumer (AquaTTY), and see whether
+Core alone is actually sufficient in practice. This doesn't resolve the
+open questions below -- it's how they'll get resolved.
+
 ## Open questions (blocking approval)
 
-- Whether "Portable" is actually sufficient for real consumers, or whether
+- Whether Core is actually sufficient for real consumers, or whether
   most real-world Scorium configs lean on `script {}` enough that a
-  Portable-only implementation is not useful in practice -- unknown until
-  `scorium-go` is built against a real consumer (AquaTTY).
+  Core-only implementation is not useful in practice -- being tested via
+  `scorium-go` against AquaTTY (see "Current status" above).
 - Whether there should be a third level between them (e.g. a restricted
   expression sandbox short of full Lua) -- no evidence yet that this is
   needed.
-- Naming: "Portable"/"Full" are placeholders, not decided terms.
+- Naming: "Core" is the working name for the no-Lua level; "Full" remains
+  a placeholder, not a decided term.
