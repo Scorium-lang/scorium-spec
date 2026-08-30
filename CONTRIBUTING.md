@@ -77,7 +77,19 @@ Reviewers will look for consistency across specification sections, fixture
 coverage, compatibility impact, implementability outside Rust and
 JavaScript, and sandbox implications.
 
-Be kind and technical. Critique the proposal, not the person.
+## Licensing of contributions
+
+By submitting a pull request, you agree to
+[CONTRIBUTOR_TERMS.md](./CONTRIBUTOR_TERMS.md), which grants @fi3w0 the
+rights needed to maintain, distribute, relicense, and commercially license
+Scorium. Scorium is source-available under PolyForm Strict 1.0.0; it is
+**not OSI-approved open source**, and contributors must be comfortable with
+that.
+
+## Conduct
+
+Be kind and technical. Assume good faith. Critique the proposal, not the
+person.
 
 ---
 
