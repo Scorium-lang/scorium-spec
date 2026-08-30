@@ -1,0 +1,202 @@
+# Conformance fixtures
+
+**Status: first full draft schema, language version `0.1.0-draft`. A real
+first batch of fixtures exists under `v0.1.0-draft/`, seeded directly from
+`scorium-rust`'s own test suite and examples — not invented.**
+
+## Intent
+
+Each native implementation runs the same fixture corpus in its own CI,
+against whichever spec version it claims to support
+(`conformance/<version>/`). A fixture failure means that implementation is
+not conformant at that version — not a bug report against the spec.
+
+Producing this JSON format is **not** something an implementation needs to
+support at all; only conformance-test tooling needs to read it. A fixture
+describes an input and an expected outcome — the encoding below exists so
+that description is unambiguous across languages, nothing more.
+
+## One JSON file per fixture
+
+Each fixture is a single self-contained `.json` file at
+`conformance/<version>/<category>/<name>.json`. `<category>` matches a
+spec section: `values/`, `evaluation/`, `diagnostics/`, `formatter/`,
+`sandbox/` (`grammar/` reserved for future pure-parse fixtures that don't
+need evaluation). There is deliberately no separate `.expect.json` /
+`.diag.json` split — one file, one fixture, is more boring and there is
+less to keep in sync.
+
+### Parser/evaluator fixtures
+
+```json
+{
+  "name": "integer division returns float",
+  "source": "result = 4 / 2",
+  "expect": {
+    "type": "entries",
+    "value": [
+      { "kind": "leaf", "key": "result", "value": { "type": "float", "value": "2.0" } }
+    ]
+  }
+}
+```
+
+Or, for a fixture that needs more than one file (`include`):
+
+```json
+{
+  "name": "include merges into the includer",
+  "files": {
+    "main.scor": "include \"theme.scor\"\ncolor_name = $accent",
+    "theme.scor": "@accent = teal\n"
+  },
+  "entry": "main.scor",
+  "expect": { "type": "entries", "value": [ /* ... */ ] }
+}
+```
+
+`files`/`entry` is an addition beyond a single `source` string — needed
+because the original three-file-per-fixture idea had nowhere to put a
+second `.scor` file, and `include` fixtures need at least two. A fixture
+uses exactly one of `source` or `files`+`entry`, never both.
+
+### Diagnostics fixtures
+
+```json
+{
+  "name": "undefined interpolation",
+  "source": "binding = $nope+Return",
+  "expect_error": { "code": "scorium::eval::undefined_interpolation" }
+}
+```
+
+Only `code` is asserted (§5: codes are the cross-language contract,
+message text is not). `source`/`files`+`entry` work the same as above.
+
+### Formatter fixtures
+
+Formatter fixtures do **not** go through the tagged-value encoding at
+all — per §4's unified-output decision, this is a source-to-source
+byte-identity check, not a semantic-value check:
+
+```json
+{
+  "name": "float keeps its decimal point",
+  "input": "x = 1.0",
+  "output": "x = 1.0\n"
+}
+```
+
+`output` MUST be produced byte-for-byte identically by every
+implementation's `fmt`, and re-formatting `output` MUST reproduce it
+exactly (idempotency, §4).
+
+### The `requires` escape hatch
+
+Any fixture MAY carry `"requires": ["lua"]` (default: absent, meaning "no
+implementation-capability requirement"). This exists so a future
+Lua-dependent (Full-level, §7) fixture has somewhere to declare that
+dependency without baking the Portable/Full split into this schema before
+§7 is settled. No fixture in the current batch uses it — the first batch
+is deliberately pure Portable-level language core.
+
+## Tagged value encoding
+
+Every semantic value (a `Value` per §2 — not an evaluated document, see
+"Entries" below) is `{"type": "<tag>", "value": <encoded>}`:
+
+| tag | value encoding |
+|---|---|
+| `int` | decimal string, e.g. `"9223372036854775807"`, `"-42"` |
+| `float` | decimal/scientific string, or one of the fixed tokens `"nan"`, `"inf"`, `"-inf"` |
+| `bool` | JSON `true`/`false` |
+| `nil` | no `value` field at all — just `{"type": "nil"}` |
+| `string` | JSON string |
+| `color` | `"#RRGGBBAA"`, **always 8 hex digits** (alpha always explicit, even if the source spelled a 6-digit literal with an implied opaque alpha) |
+| `duration` | source-style amount+unit string, e.g. `"600ms"`, `"1.5s"`, `"2m"` |
+| `list` | `{"type": "list", "value": [<value>, ...]}` |
+
+Naming note: tags use Scorium's own vocabulary (`list`, `nil`), not
+JSON's (`array`, `null`) — this schema describes Scorium values, and using
+JSON's own type names for them would blur that distinction. There is
+deliberately **no** `object`/map tag: Scorium has no map/object value
+type (§2's eight-value list has no such member) — see "Entries" below for
+why a whole evaluated document is not a `Value` at all and must not be
+squeezed into one.
+
+**Int and Float are both strings, not JSON numbers** — this is the same
+reasoning as §2's exact-representation requirement: a JSON number is a
+`double` in every common JSON library, which cannot exactly carry the
+full `Int` range and reintroduces exactly the precision-loss bugs §2
+spends a whole section forbidding. Decoding a fixture is expected to
+parse these strings with each implementation's own exact `Int`/`Float`
+parsing (whatever satisfies §2's exact-representation contract), not a
+generic JSON-number decode.
+
+**Value comparison is semantic, not textual.** A test harness decodes
+`expect` into the implementation's native value representation and
+compares it against the actual evaluation result using the value-equality
+rules in §2 — it does not byte-compare JSON or require one canonical
+string spelling per float. This is why ordinary floats need no special
+canonical form (`"2"`, `"2.0"`, and `"2.0e0"` are all fine spellings of
+the same value) — **except** the three special tokens `"nan"`, `"inf"`,
+`"-inf"`, which are fixed and case-sensitive precisely because native
+float parsers disagree on this spelling (JavaScript's `parseFloat`
+accepts `"Infinity"` but not `"inf"`, for example) — a harness or adapter
+MUST special-case exactly these three tokens rather than hand them to a
+generic string-to-float parser.
+
+## Entries: the shape of a whole evaluated document
+
+An evaluated Scorium document is **not** a `Value` — it's an ordered
+sequence of entries (leaves, nodes, includes; see `scorium-rust`'s own
+three-tier `ast::Item` / `Value` / `Entry` distinction, documented in its
+`entry.rs`). Squeezing it into a JSON object (`{"host": ..., "port":
+...}`) is tempting for the common case but silently loses two things
+Scorium actually allows: **the same node name appearing more than once**
+(a JSON object can't have two `"server"` keys), and **node headers**
+(`output eDP-1 { ... }`) have nowhere to live in a plain map. The `for`
+and `while` fixtures in this batch (`evaluation/for-loop-*.json`,
+`evaluation/while-loop-*.json`) exist specifically to prove this isn't
+hypothetical — they each produce three same-named sibling nodes.
+
+So a whole-document (or whole-node-body) result is its own tagged form,
+`entries`, an **ordered array**, not a map:
+
+```json
+{
+  "type": "entries",
+  "value": [
+    { "kind": "leaf", "key": "port", "value": { "type": "int", "value": "8080" } },
+    {
+      "kind": "node",
+      "name": "server",
+      "header": null,
+      "children": [ /* nested entries, recursively */ ]
+    },
+    { "kind": "include", "path": "theme.scor" }
+  ]
+}
+```
+
+`header` is `null` when the node has none, otherwise the header string.
+A `hostcall` kind (for `Entry::HostCall`, host-integration results) is
+not yet defined here — no fixture in this batch needs it, since
+host-integration fixtures are a separate, not-yet-designed corpus (see
+Open questions).
+
+## Open questions
+
+- Host-integration fixtures (ones needing host-registered
+  functions/values, e.g. `scorium-rust`'s `select()`/`notify()`-style
+  tests) vs. pure-language fixtures: confirmed as two separate concerns.
+  This batch is pure-language only; a host-integration corpus and its
+  `hostcall`-entry encoding are undesigned.
+- Fixtures needing non-default runtime options (e.g. a small
+  `max_loop_iterations` to make a budget test fast) aren't supported by
+  this schema yet — the two `sandbox/` fixtures in this batch instead
+  rely on tripping the *default* limits, which is slower but needs no new
+  schema field. An `"options"` override field is a plausible future
+  addition, not added speculatively here.
+- A `portable`/`full` split (§7) is intentionally deferred to `requires`
+  rather than a first-class field, per the decision above.
