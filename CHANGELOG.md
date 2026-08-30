@@ -28,7 +28,7 @@ project terms, contribution and security guidance, GitHub templates, and
 automated validation of version references, fixtures, and documentation
 links.
 
-## 0.1.0-draft — unreleased
+## 0.1.0-draft -- unreleased
 
 Initial skeleton. No normative content yet: section stubs only, seeded from
 the current `scorium-rs` documentation (`docs/GRAMMAR.md`,

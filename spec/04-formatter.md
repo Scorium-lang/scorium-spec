@@ -14,7 +14,7 @@ MUST follow this entire section and the formatter fixtures.
 
 - **Indentation**: 4 spaces per nesting level (`FormatOptions.indent_width`
   default). Tabs are never emitted.
-- **Node bodies**: `name [header] {\n<indented items>\n}` — the opening
+- **Node bodies**: `name [header] {\n<indented items>\n}` -- the opening
   brace is on the same line as the name/header, the closing brace is on
   its own line at the parent's indent.
 - **Blank lines**: at most one consecutive blank line is ever emitted
@@ -32,7 +32,7 @@ MUST follow this entire section and the formatter fixtures.
 ## Comment rendering
 
 - Line comments render as `# <text>` (space after `#`, source text
-  trimmed) — regardless of whether the source used `#` or `--`, canonical
+  trimmed) -- regardless of whether the source used `#` or `--`, canonical
   form is always `#`. `--` line comments MUST normalize to `#` on format.
 - Block comments render as `--[[<text>]]` verbatim (not reindented or
   rewrapped internally).
@@ -40,14 +40,14 @@ MUST follow this entire section and the formatter fixtures.
   comment (own line, directly above an item) and a trailing comment (same
   line, after an item) are preserved; a comment between `=` and its value,
   or inside a list/call's parentheses, is **not** tracked by the AST and
-  is dropped by the formatter. This is a known, documented limitation —
+  is dropped by the formatter. This is a known, documented limitation --
   not a bug to silently work around differently per implementation.
 
 ## Expression printing
 
 - Binary operators print with a single space on each side
   (`a + b`, never `a+b`), matching the grammar's own requirement that
-  squeezed operators are a lexer error (§1) — the formatter never needs to
+  squeezed operators are a lexer error (§1) -- the formatter never needs to
   *introduce* squeezing, only preserve the spacing rule.
 - **Parenthesization is precedence-driven, not source-preserving**: the
   parser drops explicit grouping parens from the AST, so the formatter
@@ -67,14 +67,14 @@ MUST follow this entire section and the formatter fixtures.
 
   All binary operators are left-associative. When printing a binary
   expression's right operand, the formatter requires strictly higher
-  precedence than the operator's own to decide whether to parenthesize —
+  precedence than the operator's own to decide whether to parenthesize --
   this is what correctly re-parenthesizes an explicitly-grouped
   right-associated expression like `a - (b - c)` (which is *not*
   equivalent to `a - b - c`) while never adding redundant parens to a
   left-associated chain like `a - b - c`.
 
 - **Float literals always print with an explicit decimal point**
-  (`1.0`, never `1`, for a whole-number float) — printing `1` for a float
+  (`1.0`, never `1`, for a whole-number float) -- printing `1` for a float
   value would silently re-lex as `Int` on the next parse, changing the
   value's type. This rule does not apply to duration amounts: `600` and
   `600.0` both re-lex as the same duration literal, so the formatter emits
@@ -82,7 +82,7 @@ MUST follow this entire section and the formatter fixtures.
 - String literals: quoted strings re-escape `" \ \n \t \r`; bare strings
   print their literal parts verbatim and re-emit `$name` for each
   interpolation part.
-- Lists print as `[a, b, c]` — comma-space separated, no trailing comma.
+- Lists print as `[a, b, c]` -- comma-space separated, no trailing comma.
 - Version `0.2.0` performs no automatic line wrapping for any construct,
   regardless of line length.
 
@@ -95,12 +95,12 @@ every formatter fixture's `output` string (see `conformance/README.md`).
 ## Cross-implementation conformance (resolved: unified, not per-language)
 
 **Decided:** "canonical" means one canonical output, shared by every
-implementation — not each implementation's own idea of tidy formatting.
+implementation -- not each implementation's own idea of tidy formatting.
 Every rule in this document (indentation, blank-line handling, comment
 rendering, the precedence-driven parenthesization table, float/duration
 literal formatting, string escaping, list rendering) is a single global
 answer, not a per-language style choice. There is deliberately no
-"Go-flavored" or "JS-flavored" canonical Scorium — that would defeat the
+"Go-flavored" or "JS-flavored" canonical Scorium -- that would defeat the
 point of a shared formatter contract, since two implementations' `fmt`
 output for the same input would then legitimately disagree and every
 consumer would need to know which implementation formatted a given file.
@@ -109,7 +109,7 @@ Concretely, for any implementation that provides `fmt`:
 
 - Given the same input and the same `FormatOptions` (currently just
   `indent_width`, default `4`), its output MUST be byte-for-byte identical
-  to every other conforming implementation's output — not merely
+  to every other conforming implementation's output -- not merely
   idempotent within itself.
 - The conformance fixture corpus (`conformance/README.md`) MUST include a
   `formatter/` category of golden `input`/`output` strings that every

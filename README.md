@@ -36,7 +36,7 @@ for i = 1, 3 do
 end
 ```
 
-## Current status
+## Status
 
 The current language version is **`0.2.0`**. Sections 0–6 are stable and
 normative for that version, with behavior verified independently by the Rust
@@ -77,9 +77,9 @@ Scorium belongs to no single host language. Every implementation is a peer:
 it targets the same specification, proves compatibility with the shared
 fixtures, and exposes APIs suited to its own ecosystem.
 
-- [`scorium-rs`](https://github.com/Scorium-lang/scorium-rs) — native Rust
+- [`scorium-rs`](https://github.com/Scorium-lang/scorium-rs) -- native Rust
   implementation, including the Lua execution surface.
-- [`scorium-js`](https://github.com/Scorium-lang/scorium-js) — native
+- [`scorium-js`](https://github.com/Scorium-lang/scorium-js) -- native
   TypeScript/JavaScript implementation of the non-Lua language core.
 
 An implementation version and a language version are separate. For example,
@@ -88,17 +88,36 @@ language version `0.2.0`.
 
 ## Repository layout
 
-- `spec/` — one specification document per language concern.
-- `conformance/` — fixture format and versioned fixture corpora.
-- `VERSION` — current language version.
-- `CHANGELOG.md` — language-version history.
+- `spec/` -- one specification document per language concern.
+- `conformance/` -- fixture format and versioned fixture corpora.
+- `VERSION` -- current language version.
+- `CHANGELOG.md` -- language-version history.
 
-## Contributing and security
+## Security
 
-Read [CONTRIBUTING.md](./CONTRIBUTING.md) before proposing normative changes
-or fixtures. Report security-sensitive specification flaws privately as
-described in [SECURITY.md](./SECURITY.md).
+This repository defines diagnostic and sandbox *requirements* -- it has no
+runtime of its own to secure. Report security-sensitive specification flaws
+(an underspecified rule an implementation could read as safe when it isn't)
+privately as described in [SECURITY.md](./SECURITY.md).
 
-Scorium is source-available under PolyForm Strict 1.0.0; it is **not**
-OSI-approved open source. See [LICENSE](./LICENSE) and
-[COMMERCIAL.md](./COMMERCIAL.md).
+## Licensing
+
+Scorium is **source-available** under the
+[PolyForm Strict License 1.0.0](./LICENSE). It is free for personal,
+educational, hobby, and local noncommercial use, and for contribution-focused
+forks. **Commercial use requires a written agreement.**
+
+Scorium is *not* OSI-approved open source. Only official releases published
+by @fi3w0 are sanctioned distribution channels; see
+[COMMERCIAL.md](./COMMERCIAL.md) and [TRADEMARKS.md](./TRADEMARKS.md).
+
+> The legal files are initial project terms that have not been reviewed by a
+> lawyer. Obtain professional legal review before relying on them for
+> commercial use.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md),
+[CONTRIBUTION_PERMISSION.md](./CONTRIBUTION_PERMISSION.md), and
+[CONTRIBUTOR_TERMS.md](./CONTRIBUTOR_TERMS.md) before proposing normative
+changes or fixtures.

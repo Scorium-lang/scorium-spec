@@ -10,17 +10,17 @@ Covered normatively in §1 (grammar) since it is a name-resolution rule
 tied to the `Ident`/`Member` productions: the 5-step priority order
 (local/param/loop-var → `@`-variable → sibling leaf → host value → literal
 string fallback), and `$name` interpolation having no fallback. Repeated
-here only as a cross-reference — do not restate a second, possibly
+here only as a cross-reference -- do not restate a second, possibly
 divergent, version of this rule in an implementation's evaluation code.
 
 ## Member access (`base.field`)
 
 A bare `base.field` where `base` resolves to nothing bindable (not a
-local/variable/sibling-leaf/host-value) is **not** an error — the whole
+local/variable/sibling-leaf/host-value) is **not** an error -- the whole
 `base.field` token is a literal string (this is how dotted bare strings
 like `cert.pem` work; see §1). Member access is only ever attempted when
 `base` resolves to a real value, and the only value type with fields today
-is `Color` via its three methods (§2) — accessed only as a call
+is `Color` via its three methods (§2) -- accessed only as a call
 (`.darken(x)`), never as a bare field read. A non-call member read
 (`color.darken` without `()`), or any member access on a resolved value
 that is not `Color`, MUST raise `scorium::eval::type_error`.
@@ -32,7 +32,7 @@ that is not `Color`, MUST raise `scorium::eval::type_error`.
   (see §1, Reassignment).
 - `local name = expr` introduces a lexically scoped binding. A later
   `name = expr` **leaf-shaped** statement where `name` already names a
-  `local` in scope reassigns that local instead of emitting a leaf — this
+  `local` in scope reassigns that local instead of emitting a leaf -- this
   is the only mutation mechanism in the language (§1).
 - Function parameters (`fn f(a, b) { ... }`) are bound as locals in a
   fresh scope pushed for the call; the scope is popped on return
@@ -51,13 +51,13 @@ that is not `Color`, MUST raise `scorium::eval::type_error`.
   ends; default step `1`; a step of exactly `0` (as `Int(0)` or
   `Float(0.0)`) MUST be a `scorium::eval::type_error`, not an infinite
   loop or silent no-op. The loop variable is `Int` when the computed value
-  has no fractional part, `Float` otherwise — i.e. its type can vary
+  has no fractional part, `Float` otherwise -- i.e. its type can vary
   per-iteration if `start`/`stop`/`step` are floats that happen to land on
   whole numbers.
 - `while cond do ... end`: re-evaluates `cond` each iteration; ends when it
   is falsy.
 - `and`/`or` are short-circuiting and return one of their two operand
-  values (not necessarily a `Bool`) — `Lua`-style: `a or b` yields `a` if
+  values (not necessarily a `Bool`) -- `Lua`-style: `a or b` yields `a` if
   `a` is truthy, else evaluates and yields `b`; `a and b` yields `a` if `a`
   is falsy, else evaluates and yields `b`.
 - `return [expr]` exits the innermost executing Scorium function with that
@@ -83,16 +83,16 @@ Every evaluator MUST expose the first two limits below as host-settable knobs
 and enforce them. An implementation that executes `script {}` MUST also
 expose and enforce the two script-runtime limits:
 
-- **Loop iterations** — total `for`/`while` iterations allowed across one
+- **Loop iterations** -- total `for`/`while` iterations allowed across one
   evaluation. `scorium-rs` default: `1_000_000`. Exceeding it MUST
   raise `scorium::eval::loop_budget_exceeded`, naming the limit.
-- **Evaluation/call depth** — maximum nesting depth for `fn` calls.
+- **Evaluation/call depth** -- maximum nesting depth for `fn` calls.
   `scorium-rs` default: `256`. Exceeding it MUST raise
   `scorium::eval::call_depth_exceeded`, naming the limit.
-- **Script instruction count** — VM instructions allowed per `script {}`
+- **Script instruction count** -- VM instructions allowed per `script {}`
   block. `scorium-rs` default: `50_000_000`. Exceeding it MUST raise
   `scorium::eval::script_error`.
-- **Script memory** — bytes the script runtime may allocate. `scorium-rs`
+- **Script memory** -- bytes the script runtime may allocate. `scorium-rs`
   default: `64 MiB`; `0` disables the cap. Exceeding a nonzero cap MUST raise
   `scorium::eval::script_error`.
 
@@ -126,8 +126,8 @@ outer re-entry limit appropriate to their capability model.
   with the chain listed.
 - Path policy (host-configurable, see §6): by default, parent-directory
   traversal (`..` components), absolute paths, and symlink escapes outside
-  the allowed root are denied — `scorium::eval::include_path_denied`.
-  A host may disable `include` entirely — `scorium::eval::includes_disabled`.
+  the allowed root are denied -- `scorium::eval::include_path_denied`.
+  A host may disable `include` entirely -- `scorium::eval::includes_disabled`.
 - I/O or parse failure on the included file surfaces as
   `scorium::eval::include_io` / `scorium::eval::include_parse` respectively,
   distinct from the two policy errors above.
@@ -136,7 +136,7 @@ outer re-entry limit appropriate to their capability model.
 
 When supported, `script {}` bodies are raw Lua executed by an embedded Lua VM
 under the sandbox limits in §6. This document does not specify Lua's own
-semantics — only the boundary contract:
+semantics -- only the boundary contract:
 
 - Host functions/values registered through the shared registry (§6) MUST
   be reachable identically from both plain Scorium expressions and

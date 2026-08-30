@@ -9,7 +9,7 @@ from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
 ## What's normative vs. not
 
 - **Diagnostic codes** (`scorium::<stage>::<name>`) are the cross-language
-  contract. Tooling and tests branch on codes, not message text — every
+  contract. Tooling and tests branch on codes, not message text -- every
   implementation MUST emit the same code for the same fault condition.
 - **Message text, help text, and rendering** (`scorium-rs` uses `miette`
   for source excerpts, carets, and boxes) are implementation presentation.
@@ -97,17 +97,17 @@ construct is non-conformant regardless of how reasonable the guess is.
 `scorium-core/src/diagnostic.rs`) and `EvalErrorKind::IncludeCycle`
 (`scorium::eval::include_cycle`, in `scorium-lua/src/error.rs`). Checking
 actual usage: only `EvalErrorKind::IncludeCycle` is ever constructed;
-`SyntaxError::IncludeCycle` is dead code in that implementation — defined
+`SyntaxError::IncludeCycle` is dead code in that implementation -- defined
 but never raised. This is not
 two distinct real conditions, just one live diagnostic and one vestigial
 duplicate.
 
 **Normative for `0.2.0`: `scorium::eval::include_cycle` is the only
 include-cycle code.** `scorium::include::cycle` MUST NOT be treated as
-part of the spec — a new implementation should not invent a
+part of the spec -- a new implementation should not invent a
 parse-time-vs-eval-time distinction here that doesn't actually exist in
 the verified behavior. (Separately, `scorium-rs` itself carries dead
-code defining the unused variant — worth a small cleanup there at some
+code defining the unused variant -- worth a small cleanup there at some
 point, but that's a `scorium-rs` housekeeping change, not a spec
 concern, and out of scope for this specification version.)
 

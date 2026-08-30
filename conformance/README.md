@@ -9,11 +9,11 @@ and the normative decisions recorded by this specification.**
 Each native implementation runs the same fixture corpus in its own CI,
 against whichever spec version it claims to support
 (`conformance/v<version>/`). A fixture failure means that implementation is
-not conformant at that version — not a bug report against the spec.
+not conformant at that version -- not a bug report against the spec.
 
 Producing this JSON format is **not** something an implementation needs to
 support at all; only conformance-test tooling needs to read it. A fixture
-describes an input and an expected outcome — the encoding below exists so
+describes an input and an expected outcome -- the encoding below exists so
 that description is unambiguous across languages, nothing more.
 
 ## One JSON file per fixture
@@ -23,7 +23,7 @@ Each fixture is a single self-contained `.json` file at
 spec section: `values/`, `evaluation/`, `diagnostics/`, `formatter/`,
 `sandbox/` (`grammar/` reserved for future pure-parse fixtures that don't
 need evaluation). There is deliberately no separate `.expect.json` /
-`.diag.json` split — one file, one fixture, is more boring and there is
+`.diag.json` split -- one file, one fixture, is more boring and there is
 less to keep in sync.
 
 ### Parser/evaluator fixtures
@@ -55,7 +55,7 @@ Or, for a fixture that needs more than one file (`include`):
 }
 ```
 
-`files`/`entry` is an addition beyond a single `source` string — needed
+`files`/`entry` is an addition beyond a single `source` string -- needed
 because the original three-file-per-fixture idea had nowhere to put a
 second `.scor` file, and `include` fixtures need at least two. A fixture
 uses exactly one of `source` or `files`+`entry`, never both.
@@ -97,7 +97,7 @@ message text is not). `source`/`files`+`entry` work the same as above.
 ### Formatter fixtures
 
 Formatter fixtures do **not** go through the tagged-value encoding at
-all — per §4's unified-output decision, this is a source-to-source
+all -- per §4's unified-output decision, this is a source-to-source
 byte-identity check, not a semantic-value check:
 
 ```json
@@ -122,7 +122,7 @@ language core available without Lua execution.
 
 ## Tagged value encoding
 
-Every semantic value (a `Value` per §2 — not an evaluated document, see
+Every semantic value (a `Value` per §2 -- not an evaluated document, see
 "Entries" below) is `{"type": "<tag>", "value": <encoded>}`:
 
 | tag | value encoding |
@@ -130,21 +130,21 @@ Every semantic value (a `Value` per §2 — not an evaluated document, see
 | `int` | decimal string, e.g. `"9223372036854775807"`, `"-42"` |
 | `float` | decimal/scientific string, or one of the fixed tokens `"nan"`, `"inf"`, `"-inf"` |
 | `bool` | JSON `true`/`false` |
-| `nil` | no `value` field at all — just `{"type": "nil"}` |
+| `nil` | no `value` field at all -- just `{"type": "nil"}` |
 | `string` | JSON string |
 | `color` | `"#RRGGBBAA"`, **always 8 hex digits** (alpha always explicit, even if the source spelled a 6-digit literal with an implied opaque alpha) |
 | `duration` | source-style amount+unit string, e.g. `"600ms"`, `"1.5s"`, `"2m"` |
 | `list` | `{"type": "list", "value": [<value>, ...]}` |
 
 Naming note: tags use Scorium's own vocabulary (`list`, `nil`), not
-JSON's (`array`, `null`) — this schema describes Scorium values, and using
+JSON's (`array`, `null`) -- this schema describes Scorium values, and using
 JSON's own type names for them would blur that distinction. There is
 deliberately **no** `object`/map tag: Scorium has no map/object value
-type (§2's eight-value list has no such member) — see "Entries" below for
+type (§2's eight-value list has no such member) -- see "Entries" below for
 why a whole evaluated document is not a `Value` at all and must not be
 squeezed into one.
 
-**Int and Float are both strings, not JSON numbers** — this is the same
+**Int and Float are both strings, not JSON numbers** -- this is the same
 reasoning as §2's exact-representation requirement: a JSON number is a
 `double` in every common JSON library, which cannot exactly carry the
 full `Int` range and reintroduces exactly the precision-loss bugs §2
@@ -153,7 +153,7 @@ parse these strings with each implementation's own exact `Int`/`Float`
 parsing (whatever satisfies §2's exact-representation contract), not a
 generic JSON-number decode.
 
-**Value comparison is semantic, not textual — and it is fixture-assertion
+**Value comparison is semantic, not textual -- and it is fixture-assertion
 equality, not §2's runtime `==`.** A test harness decodes `expect` into
 the implementation's native value representation and structurally
 compares it against the actual evaluation result. This is *not* the same
@@ -161,23 +161,23 @@ relation as §2's `==` operator: §2 deliberately defines `NaN` as unequal
 to everything, including itself (matching Lua/IEEE-754), because that's
 the right behavior for a Scorium program comparing two runtime values.
 But a fixture asserting "evaluating this produced `NaN`" needs "did I get
-the value I expected" — under which a `NaN` expectation MUST match a
+the value I expected" -- under which a `NaN` expectation MUST match a
 `NaN` result. A harness that reused `==` verbatim for fixture assertions
 could never write a passing `NaN`-producing fixture at all. So: ordinary
 values compare equal exactly when §2's `==` says so; `NaN`-to-`NaN` is the
 one deliberate exception, always a match for fixture purposes.
 
 This is also why ordinary floats need no special canonical form (`"2"`,
-`"2.0"`, and `"2.0e0"` are all fine spellings of the same value) — except
+`"2.0"`, and `"2.0e0"` are all fine spellings of the same value) -- except
 the three special tokens `"nan"`, `"inf"`, `"-inf"`, fixed and
 case-sensitive precisely because native float parsers disagree on this
 spelling (JavaScript's `parseFloat` accepts `"Infinity"` but not `"inf"`,
-for example) — a harness or adapter MUST special-case exactly these three
+for example) -- a harness or adapter MUST special-case exactly these three
 tokens rather than hand them to a generic string-to-float parser.
 
 ## Entries: the shape of a whole evaluated document
 
-An evaluated Scorium document is **not** a `Value` — it's an ordered
+An evaluated Scorium document is **not** a `Value` -- it's an ordered
 sequence of entries (leaves, nodes, includes; see `scorium-rs`'s own
 three-tier `ast::Item` / `Value` / `Entry` distinction, documented in its
 `entry.rs`). Squeezing it into a JSON object (`{"host": ..., "port":
@@ -187,7 +187,7 @@ Scorium actually allows: **the same node name appearing more than once**
 (`output eDP-1 { ... }`) have nowhere to live in a plain map. The `for`
 and `while` fixtures in this batch (`evaluation/for-loop-*.json`,
 `evaluation/while-loop-*.json`) exist specifically to prove this isn't
-hypothetical — they each produce three same-named sibling nodes.
+hypothetical -- they each produce three same-named sibling nodes.
 
 So a whole-document (or whole-node-body) result is its own tagged form,
 `entries`, an **ordered array**, not a map:

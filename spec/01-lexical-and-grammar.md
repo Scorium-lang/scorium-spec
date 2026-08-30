@@ -40,7 +40,7 @@ expected (after `=`, inside a list, as a function argument). A `#` starting
 a token where a statement or value is not expected begins a line comment.
 
 Block comments do not nest (nesting is explicitly out of scope for
-`0.2.0` — see Roadmap alignment below).
+`0.2.0` -- see Roadmap alignment below).
 
 ### Identifiers and markers
 
@@ -73,7 +73,7 @@ number     ::= int | float
 quoted_str ::= '"' { char_or_escape } '"'
 ```
 
-A duration without a unit is **not** a duration — it is an integer or
+A duration without a unit is **not** a duration -- it is an integer or
 float. Whether a unitless number is accepted where a duration is expected
 is a schema-level decision (rejected by default; see §2 Value semantics).
 
@@ -140,7 +140,7 @@ local_stmt ::= 'local' ident '=' expr
 `@name` defines a variable visible to later items in the same or enclosing
 scope. `local name = expr` introduces a lexically scoped variable (used for
 loop counters and function bodies). A `key = value` leaf whose key is
-already a `local` reassigns that local in place — this is the only
+already a `local` reassigns that local in place -- this is the only
 spelling Scorium has for updating a counter (see "Reassignment" below).
 
 ### Control flow
@@ -174,7 +174,7 @@ MUST raise `scorium::eval::return_outside_function`; it must never silently
 truncate document or node evaluation.
 
 A `script { }` body is raw Lua text handed verbatim to a sandboxed Lua
-runtime — it MUST NOT be transpiled or reformatted. Lua execution is an
+runtime -- it MUST NOT be transpiled or reformatted. Lua execution is an
 optional implementation capability in `0.2.0`. An implementation without it
 MUST still parse, preserve, and format the production and MUST raise
 `scorium::eval::script_error` when evaluation reaches it, rather than failing
@@ -238,7 +238,7 @@ evaluation time, in this exact priority order:
 This fallback-to-literal-string rule is load-bearing and easy to get
 subtly wrong in a reimplementation: it is what lets `select(kitty,
 alacritty, foot)` skip quoting. Every native implementation MUST replicate
-this exact resolution order — a different order (e.g. checking
+this exact resolution order -- a different order (e.g. checking
 host-registered values before sibling leaves) is an observable, testable
 divergence, not an internal detail.
 
@@ -259,7 +259,7 @@ while i < 3 do
 end
 ```
 
-`@`-defined variables are **not** reassignable through this mechanism —
+`@`-defined variables are **not** reassignable through this mechanism --
 only `local`s are. An implementation that allowed reassigning an
 `@`-variable this way would silently diverge from every other
 implementation's scoping behavior.
@@ -294,7 +294,7 @@ here):
   by a host, e.g. a bespoke `10MB` byte-size token). The host-defined
   *type* extension point (validating an already-parsed value) is a
   runtime/schema concern, not a grammar concern, and is unaffected.
-- Generic `for` over tables/iterators — only the numeric `for` is
+- Generic `for` over tables/iterators -- only the numeric `for` is
   specified. (A Lua-capable implementation's `script { }` body may still
   use Lua's own generic `for`; that is Lua's grammar, not Scorium's.)
 - A `.scor`-based schema file format.

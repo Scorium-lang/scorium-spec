@@ -9,29 +9,29 @@ Defines what "Scorium" means independent of any one implementation.
 
 ## Design principle
 
-The interesting, load-bearing idea of the language — the thing every
-section below exists to serve, not just one feature among many — is:
+The interesting, load-bearing idea of the language -- the thing every
+section below exists to serve, not just one feature among many -- is:
 
 **readable configuration that can become programmable when needed,
 without switching formats.**
 
-A beginner writes plain, static config (nodes, leaves, typed values — §1,
+A beginner writes plain, static config (nodes, leaves, typed values -- §1,
 §2) and never needs to know the language has a programming model at all.
 An advanced user reaches for variables, expressions, conditions, loops,
 and functions (§3) directly in the same file, in the same syntax, without
 migrating to a different config format or a general-purpose language to
-get there. That progressive path — declarative first, programmable on
-demand, one format throughout — is what distinguishes Scorium from both
+get there. That progressive path -- declarative first, programmable on
+demand, one format throughout -- is what distinguishes Scorium from both
 "just a data format" (JSON/YAML/TOML) and "just an embedded scripting
 language with config-shaped output."
 
 This matters directly for how the rest of this document should be read: the
 native evaluation model in §3
-— variables, expressions, conditionals, loops, user-defined `fn` — is
+-- variables, expressions, conditionals, loops, user-defined `fn` -- is
 **not** a lesser subset bolted on for portability's sake. It *is* the
 "becomes programmable" half of the core value proposition, and every
 implementation gets it natively, in its own language, with no embedded
-VM required. Raw `script {}` (Lua, §6) is an escape hatch beyond that —
+VM required. Raw `script {}` (Lua, §6) is an escape hatch beyond that --
 useful, but an optional execution capability in version `0.2.0`. An
 implementation without Lua execution has still delivered the actual design
 principle above, not a crippled placeholder waiting for Lua support. Language

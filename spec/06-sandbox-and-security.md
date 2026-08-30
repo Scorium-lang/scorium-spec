@@ -18,7 +18,7 @@ are concepts, not required API identifier spellings:
 | Lua memory limit (bytes the Lua state may allocate; `0` disables it) | 64 MiB | Lua allocation failure surfaces as `scorium::eval::script_error` |
 
 These are `scorium-rs`'s current default values, listed here as
-reasonable starting points, not as fixed normative numbers — see §3 for
+reasonable starting points, not as fixed normative numbers -- see §3 for
 the full statement of what's normative (the limit's existence,
 configurability, and error path) versus what's an implementation choice
 (the default value). A future named **compatibility profile** could pin
@@ -28,7 +28,7 @@ is defined in `0.2.0`.
 ## Lua sandbox scope
 
 `scorium-rs` runs `script {}` in a restricted Lua state exposing only
-`math`, `string`, and `table` from the standard library — explicitly
+`math`, `string`, and `table` from the standard library -- explicitly
 **not** `io`, `os`, `package`, `debug`, or any process/network access.
 
 The security outcome is normative, not the Lua VM's module names. A script
@@ -42,7 +42,7 @@ organize safe primitives differently while preserving the same outcome.
 
 A single registry mechanism registers host functions and values. They are
 reachable from plain Scorium expressions (`f(a, b)`, bare identifier
-reference) and, when Lua execution is supported, from `script {}` bodies —
+reference) and, when Lua execution is supported, from `script {}` bodies --
 "one registry, multiple surfaces." A Lua-capable implementation MUST preserve
 this property: a host function registered once is callable from both surfaces
 without separate registration. An implementation without Lua execution still
@@ -57,21 +57,21 @@ Default policy (`IncludePolicy` in `scorium-rs`):
 - Parent-directory traversal (`..` path components) is **rejected** by
   default; a host MAY opt in to allowing it.
 - Absolute paths and symlink escapes outside the allowed root are rejected
-  regardless of the traversal setting — these are not covered by the
+  regardless of the traversal setting -- these are not covered by the
   `allow_parent_traversal` opt-in and MUST remain denied by default in
   every implementation.
 - Cycle detection is independent of path policy and always active (§3).
 
 **Containment is normative, and MUST be enforced on the canonical
 (resolved) path, never the textual path.** This is not an implementation
-detail left to each host — it is a security property every conforming
+detail left to each host -- it is a security property every conforming
 implementation MUST provide identically:
 
 1. Reject a textual `..` component or an absolute path outright (cheap,
    pre-filesystem check) unless the host has opted into
    `allow_parent_traversal`.
-2. Independently — because a purely relative, `..`-free path can still
-   escape through a symlink — canonicalize both the include root
+2. Independently -- because a purely relative, `..`-free path can still
+   escape through a symlink -- canonicalize both the include root
    (`base_dir`) and the resolved target path (resolving all symlinks,
    including a chain of them), then require the canonical target to be
    contained within the canonical root (`target.starts_with(root)` on the
@@ -80,7 +80,7 @@ implementation MUST provide identically:
    used a literal `..`.
 
 Concretely: given a root at `root/` containing `root/config.sc`, an
-`include "../secret.sc"` MUST be denied after canonicalization — and so
+`include "../secret.sc"` MUST be denied after canonicalization -- and so
 MUST an `include "safe.sc"` where `root/safe.sc` is itself a symlink
 resolving outside `root/`, even though its literal path contains no `..`
 and is not absolute. Implementations MUST NOT rely on textual path

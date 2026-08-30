@@ -18,14 +18,14 @@ Value ::= Int(i64-range integer)
 ```
 
 Eight value types, no others, for `0.2.0`. An implementation MUST
-keep `Int` and `Float` distinct representations — collapsing both into one
+keep `Int` and `Float` distinct representations -- collapsing both into one
 numeric type (as a prototype implementation might, for convenience) is a
 non-conformant simplification, because it silently changes arithmetic and
 formatting results (see below).
 
-`Color` is stored as four real channels, not a string — `primary.darken(0.25)`
+`Color` is stored as four real channels, not a string -- `primary.darken(0.25)`
 operates on the channels directly. `Duration` stores `(amount, unit)`, not a
-normalized millisecond count — the unit is part of the value's identity, not
+normalized millisecond count -- the unit is part of the value's identity, not
 just display formatting.
 
 ## Truthiness
@@ -41,7 +41,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
   silently wrap or promote to a bigger/float type.
 - `Int / Int` MUST always produce a `Float`, even when evenly divisible
   (`6 / 2` is `Float(3.0)`, not `Int(3)`). This is a deliberate asymmetry
-  with `+`/`-`/`*` and MUST be preserved — it's the one operator where
+  with `+`/`-`/`*` and MUST be preserved -- it's the one operator where
   Scorium's integer type does not stay closed under itself.
 - `Int % Int` MUST use Euclidean remainder, defined mathematically (not by
   reference to any host language's `%`) so every implementation agrees
@@ -62,7 +62,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
   ```
 
   Note the result's sign always matches this `0 <= r < |b|` rule, not the
-  sign of either operand — this deliberately differs from Rust's/C's
+  sign of either operand -- this deliberately differs from Rust's/C's
   truncated `%` and from what some languages' native operator gives for
   negative operands; implementations MUST NOT delegate to their host
   language's built-in `%` without checking it actually implements
@@ -73,7 +73,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
   `scorium::eval::division_by_zero`.
 - Any arithmetic op where at least one operand is a `Float` (and the other
   is `Int` or `Float`) produces a `Float`, computed as an ordinary IEEE-754
-  double operation — no overflow checking (floats saturate to infinity per
+  double operation -- no overflow checking (floats saturate to infinity per
   IEEE-754, which is accepted, not an error).
 - Arithmetic on any other value type (or type pair) MUST raise
   `scorium::eval::type_error`, naming both operand types.
@@ -87,7 +87,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
   by casting the integer to a float first: casting can lose precision for
   integers beyond `2^53`, causing values that are actually different to
   compare equal. This MUST NOT be implemented as `(n as f64) == f` (or the
-  ordered equivalent) for an arbitrary `i64` — the algorithm, in order:
+  ordered equivalent) for an arbitrary `i64` -- the algorithm, in order:
 
   1. If the float is `NaN`, the comparison result is defined by the NaN
      rule below (never proceed past this step).
@@ -113,7 +113,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
   into the same bounds test, since `±Infinity` already falls outside the
   `i64`-representable range).
 - Any comparison against `NaN` (ordered `< > <= >=`) MUST evaluate to
-  `false`, matching Lua's NaN behavior — not raise an error. This applies
+  `false`, matching Lua's NaN behavior -- not raise an error. This applies
   whether the `NaN` came from a `Float`/`Float` or `Int`/`Float` pair.
 - **Equality** between `Int(n)` and `Float(f)` MUST use this precise
   definition, not a looser "close enough" or naive-cast check:
@@ -125,7 +125,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
                          AND  (f truncated and converted to i64) == n
   ```
 
-  Every clause must hold — a finite float with a fractional part, or one
+  Every clause must hold -- a finite float with a fractional part, or one
   outside exact range, is never equal to any integer regardless of
   rounding. `==`/`~=` between any other mismatched types (e.g. `Str` vs
   `Int`) is `false`/`true` respectively, not an error.
@@ -156,7 +156,7 @@ No other value type has methods in `0.2.0`.
 ## Duration semantics
 
 A duration is `(amount: f64, unit)`. There is no implicit conversion between
-units at the value level — `as_millis()`-style normalization is a host/runtime
+units at the value level -- `as_millis()`-style normalization is a host/runtime
 convenience, not a language operation. Equality compares both fields exactly:
 `1s == 1s` is true, while `1s == 1000ms` is false. Ordered comparison and all
 arithmetic operators on durations MUST raise `scorium::eval::type_error`.
@@ -165,7 +165,7 @@ host consumption.
 
 ## Lists
 
-`List(Value*)` — no declared element-type constraint at the value level;
+`List(Value*)` -- no declared element-type constraint at the value level;
 mixed-type lists are permitted by the value model (schema-level
 homogeneity constraints, if any, are `scorium-schema`'s concern, not a
 core value-semantics rule).
@@ -177,7 +177,7 @@ core value-semantics rule).
 representation:
 
 **Every conforming implementation MUST represent the complete Scorium
-`Int` domain — the full 64-bit signed integer range — exactly, with no
+`Int` domain -- the full 64-bit signed integer range -- exactly, with no
 precision loss for any representable value.** The exact-comparison and
 exact-equality rules above assume a true integer domain; an
 implementation whose internal `Int` representation loses precision
@@ -185,12 +185,12 @@ anywhere in that range does not satisfy them, regardless of how it gets
 there internally.
 
 How a given host language's implementation satisfies this is that
-implementation's own concern, not this document's — this spec fixes the
+implementation's own concern, not this document's -- this spec fixes the
 contract, not the representation technology. (For example: a language
 whose native numeric type does not cover the full `i64` range exactly
 would need some wider-than-native integer representation to conform; the
 specific choice and its trade-offs belong in that implementation's own
-docs, e.g. a future `scorium-js` implementation note — not here.) Adding
+docs, e.g. a future `scorium-js` implementation note -- not here.) Adding
 implementation-technology prescriptions to this document is exactly the
 kind of repo-proximity coupling `scorium-spec` exists to avoid (see
 `README.md`).
