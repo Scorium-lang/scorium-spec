@@ -1,9 +1,9 @@
 # 1. Lexical structure and grammar
 
-**Status: first full draft, language version `0.1.0-draft`. Normative for
-implementations targeting this version. Derived from `scorium-rust`'s
+**Status: first full draft, language version `0.2.0-draft`. Normative for
+implementations targeting this version. Derived from `scorium-rs`'s
 parser (`crates/scorium-core/src/{lexer,parser}.rs`, documented in
-`scorium-rust/docs/GRAMMAR.md`) as initial ground truth — not yet
+`scorium-rs/docs/GRAMMAR.md`) as initial ground truth — not yet
 cross-checked against a second implementation, so treat as draft until
 `scorium-go` has attempted to conform to it.**
 
@@ -12,9 +12,9 @@ Notation is extended-BNF-ish, written for readability over formality.
 separated by `|`.
 
 Every implementation MUST accept and reject input identically per this
-grammar for language version `0.1.0-draft`. Where behavior described here
-turns out to diverge from what `scorium-rust` actually does, that is a bug
-to fix explicitly (in the spec or in `scorium-rust`), not something a new
+grammar for language version `0.2.0-draft`. Where behavior described here
+turns out to diverge from what `scorium-rs` actually does, that is a bug
+to fix explicitly (in the spec or in `scorium-rs`), not something a new
 implementation should silently match by copying Rust's behavior without
 recording the discrepancy.
 
@@ -43,7 +43,7 @@ expected (after `=`, inside a list, as a function argument). A `#` starting
 a token where a statement or value is not expected begins a line comment.
 
 Block comments do not nest (nesting is explicitly out of scope for
-`0.1.0-draft` — see Roadmap alignment below).
+`0.2.0-draft` — see Roadmap alignment below).
 
 ### Identifiers and markers
 
@@ -219,7 +219,7 @@ escape     ::= '\' ('"' | '\' | 'n' | 't' | 'r')
 
 `$name` interpolation is allowed **only** inside a bare string. Inside a
 quoted string, `$name` is literal text. Escapes beyond `\" \\ \n \t \r`
-(e.g. `\u{...}`) are out of scope for `0.1.0-draft`.
+(e.g. `\u{...}`) are out of scope for `0.2.0-draft`.
 
 ### Identifier resolution
 
@@ -281,7 +281,7 @@ namespace defined in §5).
 
 ---
 
-## Roadmap alignment for `0.1.0-draft`
+## Roadmap alignment for `0.2.0-draft`
 
 Explicitly out of scope for this spec version (tracked as future spec
 versions once there is a concrete need, not implied by their absence

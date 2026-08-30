@@ -1,6 +1,6 @@
 # 3. Evaluation rules
 
-**Status: first full draft, language version `0.1.0-draft`. Normative for
+**Status: first full draft, language version `0.2.0-draft`. Normative for
 the Portable level (see §7); `script {}` execution semantics belong to Lua
 itself and are out of scope here beyond the boundary rules stated below.
 Derived from `crates/scorium-lua/src/eval.rs` and `runtime.rs`.**
@@ -73,16 +73,16 @@ each as a host-settable knob and MUST enforce it, regardless of what
 default value it picks:
 
 - **Loop iterations** — total `for`/`while` iterations allowed across one
-  evaluation. `scorium-rust` default: `1_000_000`. Exceeding it MUST
+  evaluation. `scorium-rs` default: `1_000_000`. Exceeding it MUST
   raise `scorium::eval::loop_budget_exceeded`, naming the limit.
 - **Evaluation/call depth** — maximum nesting depth for `fn` calls.
-  `scorium-rust` default: `256`. Exceeding it MUST raise
+  `scorium-rs` default: `256`. Exceeding it MUST raise
   `scorium::eval::call_depth_exceeded`, naming the limit.
 - **Script instruction count** — VM instructions allowed per `script {}`
-  block (Full-level implementations only, §7). `scorium-rust` default:
+  block (Full-level implementations only, §7). `scorium-rs` default:
   `50_000_000`.
 - **Script memory** — bytes the script runtime may allocate (Full-level
-  only). `scorium-rust` default: `64 MiB`, `0` disables the cap.
+  only). `scorium-rs` default: `64 MiB`, `0` disables the cap.
 
 The existence of these four limits, the requirement that a host can
 configure each, and the requirement that exceeding one produces the
@@ -92,7 +92,7 @@ ship different defaults. A future **compatibility profile** concept — a
 named, spec-defined set of pinned default values implementations can
 opt into for byte-for-byte behavioral comparison across languages — is
 worth considering once there's a concrete cross-implementation testing
-need for it, but is not defined in `0.1.0-draft`.
+need for it, but is not defined in `0.2.0-draft`.
 
 A native implementation embedding a runtime without these checks (e.g.
 relying on the host language's own stack limit for recursion instead of
@@ -108,7 +108,7 @@ evaluation (e.g. by invoking a host function that re-enters the
 evaluator), does that recursion draw from **one shared** call-depth
 budget across both the Scorium and Lua sides, or **two independent**
 budgets (a Scorium `fn`-depth counter and a separate Lua call-depth
-counter)? `scorium-rust`'s current `max_function_call_depth` only counts
+counter)? `scorium-rs`'s current `max_function_call_depth` only counts
 `call_user_fn` (pure Scorium `fn` recursion) — it does not appear to
 account for depth contributed by a round-trip through Lua at all, which
 means a Scorium→Lua→Scorium cycle could exceed any *intended* combined
@@ -159,5 +159,5 @@ sandbox limits in §6. This document does not specify Lua's own semantics
   fixtures that would actually distinguish the orders before they can be
   made normative.
 - Whether `return` outside a `fn` body is a grammar-level parse error or
-  an evaluation-level error is unconfirmed against `scorium-rust`'s actual
+  an evaluation-level error is unconfirmed against `scorium-rs`'s actual
   behavior (see inline note above).

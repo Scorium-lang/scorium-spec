@@ -1,6 +1,6 @@
 # 6. Sandbox and security rules
 
-**Status: first full draft, language version `0.1.0-draft`. Normative.
+**Status: first full draft, language version `0.2.0-draft`. Normative.
 Derived from `crates/scorium-lua/src/runtime.rs`.**
 
 ## Resource limits
@@ -9,24 +9,24 @@ Every implementation that executes Scorium MUST expose these as
 host-configurable knobs (names below are the concepts, not required
 identifier spellings) and MUST enforce them:
 
-| limit | `scorium-rust` default | enforcement |
+| limit | `scorium-rs` default | enforcement |
 |---|---|---|
 | loop budget (total `for`/`while` iterations per evaluation) | 1,000,000 | `scorium::eval::loop_budget_exceeded` |
 | function call depth (`fn` nesting) | 256 | `scorium::eval::call_depth_exceeded` |
 | script instruction budget (Lua VM instructions per `script {}`, only relevant to a Full-level implementation, §7) | 50,000,000 | script execution aborts; surfaces as `scorium::eval::script_error` |
 | Lua memory limit (bytes the Lua state may allocate; `0` disables it) | 64 MiB | Lua allocation failure surfaces as `scorium::eval::script_error` |
 
-These are `scorium-rust`'s current default values, listed here as
+These are `scorium-rs`'s current default values, listed here as
 reasonable starting points, not as fixed normative numbers — see §3 for
 the full statement of what's normative (the limit's existence,
 configurability, and error path) versus what's an implementation choice
 (the default value). A future named **compatibility profile** could pin
 these defaults for cross-implementation comparison, but no such profile
-is defined in `0.1.0-draft`.
+is defined in `0.2.0-draft`.
 
 ## Lua sandbox scope (Full-level implementations only, §7)
 
-`scorium-rust` runs `script {}` in a restricted Lua state exposing only
+`scorium-rs` runs `script {}` in a restricted Lua state exposing only
 `math`, `string`, and `table` from the standard library — explicitly
 **not** `io`, `os`, `package`, `debug`, or any process/network access.
 
@@ -51,7 +51,7 @@ half of this to be usable by real consumers.
 
 ## `include` path policy
 
-Default policy (`IncludePolicy` in `scorium-rust`):
+Default policy (`IncludePolicy` in `scorium-rs`):
 
 - `include` is enabled by default; a host MAY disable it entirely
   (`scorium::eval::includes_disabled`).
@@ -86,7 +86,7 @@ MUST an `include "safe.sc"` where `root/safe.sc` is itself a symlink
 resolving outside `root/`, even though its literal path contains no `..`
 and is not absolute. Implementations MUST NOT rely on textual path
 inspection alone; symlink-based containment bypass is exactly the failure
-mode canonicalization exists to close. `scorium-rust`'s `exec_include`
+mode canonicalization exists to close. `scorium-rs`'s `exec_include`
 (`crates/scorium-lua/src/eval.rs`) implements this two-step check and is
 the reference for the algorithm.
 

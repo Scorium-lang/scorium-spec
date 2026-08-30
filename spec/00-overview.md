@@ -1,7 +1,8 @@
 # 0. Overview
 
-**Status: Design principle below is settled; the rest of this file is
-still outline only.**
+**Status: first full draft, language version `0.2.0-draft`. The design
+principle below is settled; unresolved project-level decisions are marked
+explicitly as open.**
 
 ## Purpose
 
@@ -43,11 +44,11 @@ up to.
 ## What this spec must eventually pin down
 
 - The name and version scheme for the language itself, independent of any
-  implementation's own release version (e.g. `scorium-rust` 0.1.0 implementing
-  language version `0.1.0-draft`).
+  implementation's own release version (e.g. `scorium-rs` 0.1.0 implementing
+  language version `0.2.0-draft`).
 - Which sections are normative (MUST-level, testable by conformance
   fixtures) versus informative (rationale, examples).
-- The relationship between this spec and `scorium-rust`: the Rust
+- The relationship between this spec and `scorium-rs`: the Rust
   implementation is the current reference implementation and initial source
   of ground truth, but this document — once versioned 1.0 — is the
   authority implementations conform to, not the Rust source.

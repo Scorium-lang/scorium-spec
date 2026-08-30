@@ -1,6 +1,6 @@
 # 5. Diagnostic model
 
-**Status: first full draft, language version `0.1.0-draft`. The code
+**Status: first full draft, language version `0.2.0-draft`. The code
 catalog below is normative; message text and rendering are not. Derived
 from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
 `crates/scorium-lua/src/error.rs` (eval), and
@@ -11,7 +11,7 @@ from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
 - **Diagnostic codes** (`scorium::<stage>::<name>`) are the cross-language
   contract. Tooling and tests branch on codes, not message text — every
   implementation MUST emit the same code for the same fault condition.
-- **Message text, help text, and rendering** (`scorium-rust` uses `miette`
+- **Message text, help text, and rendering** (`scorium-rs` uses `miette`
   for source excerpts, carets, and boxes) are implementation presentation.
   A different implementation is free to render differently, or to
   translate message text, as long as the code and the required structured
@@ -41,7 +41,7 @@ implementation) MUST raise a diagnostic with a defined code. Silently
 ignoring, no-op'ing, or best-effort-guessing a value for an unsupported
 construct is non-conformant regardless of how reasonable the guess is.
 
-## Code catalog (language version `0.1.0-draft`)
+## Code catalog (language version `0.2.0-draft`)
 
 ### `scorium::lex::*`
 
@@ -93,7 +93,7 @@ construct is non-conformant regardless of how reasonable the guess is.
 
 ## Resolved: `include::cycle` vs. `eval::include_cycle`
 
-`scorium-rust` defines two include-cycle diagnostic variants:
+`scorium-rs` defines two include-cycle diagnostic variants:
 `SyntaxError::IncludeCycle` (`scorium::include::cycle`, in
 `scorium-core/src/diagnostic.rs`) and `EvalErrorKind::IncludeCycle`
 (`scorium::eval::include_cycle`, in `scorium-lua/src/error.rs`). Checking
@@ -103,13 +103,13 @@ in the reference implementation — defined but never raised. This is not
 two distinct real conditions, just one live diagnostic and one vestigial
 duplicate.
 
-**Normative for `0.1.0-draft`: `scorium::eval::include_cycle` is the only
+**Normative for `0.2.0-draft`: `scorium::eval::include_cycle` is the only
 include-cycle code.** `scorium::include::cycle` MUST NOT be treated as
 part of the spec — a new implementation should not invent a
 parse-time-vs-eval-time distinction here that doesn't actually exist in
-the reference behavior. (Separately, `scorium-rust` itself carries dead
+the reference behavior. (Separately, `scorium-rs` itself carries dead
 code defining the unused variant — worth a small cleanup there at some
-point, but that's a `scorium-rust` housekeeping change, not a spec
+point, but that's a `scorium-rs` housekeeping change, not a spec
 concern, and out of scope for this drafting pass.)
 
 ## Open questions

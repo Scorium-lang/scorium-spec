@@ -1,7 +1,7 @@
 # 2. Value semantics
 
-**Status: first full draft, language version `0.1.0-draft`. Normative.
-Derived from `scorium-rust`'s `Value` type and evaluator
+**Status: first full draft, language version `0.2.0-draft`. Normative.
+Derived from `scorium-rs`'s `Value` type and evaluator
 (`crates/scorium-core/src/value.rs`, `crates/scorium-lua/src/eval.rs`).**
 
 ## Value types
@@ -17,7 +17,7 @@ Value ::= Int(i64-range integer)
         | List(Value*)
 ```
 
-Eight value types, no others, for `0.1.0-draft`. An implementation MUST
+Eight value types, no others, for `0.2.0-draft`. An implementation MUST
 keep `Int` and `Float` distinct representations — collapsing both into one
 numeric type (as a prototype implementation might, for convenience) is a
 non-conformant simplification, because it silently changes arithmetic and
@@ -108,7 +108,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
        integer; a negative one makes it less; a zero remainder makes them
        equal.
 
-  See `scorium-rust`'s `cmp_int_float` for a reference implementation of
+  See `scorium-rs`'s `cmp_int_float` for a reference implementation of
   steps 3–4 (its range checks and step 2's infinity handling collapse
   into the same bounds test, since `±Infinity` already falls outside the
   `i64`-representable range).
@@ -151,7 +151,7 @@ not their language default.
 
 Calling any other method name on a color, or calling a color method with
 the wrong argument count/type, MUST raise `scorium::eval::type_error`.
-No other value type has methods in `0.1.0-draft`.
+No other value type has methods in `0.2.0-draft`.
 
 ## Duration semantics
 
@@ -160,7 +160,7 @@ between units at the value level — `as_millis()`-style normalization (for
 comparison or host consumption) is a host/runtime convenience, not
 something the language does implicitly to two durations with different
 units in an expression. (Whether durations of different units can be
-compared/added at all in `0.1.0-draft` is unresolved — `scorium-rust`'s
+compared/added at all in `0.2.0-draft` is unresolved — `scorium-rs`'s
 current evaluator does not appear to define duration arithmetic; treat
 duration values as opaque outside of construction and host consumption
 until this is confirmed against the reference implementation and stated
@@ -176,7 +176,7 @@ core value-semantics rule).
 ## Numeric range and exact representation
 
 `Int` is specified as the full signed 64-bit range (`i64`) to match
-`scorium-rust`. This is a language contract, stated as an outcome, not a
+`scorium-rs`. This is a language contract, stated as an outcome, not a
 representation:
 
 **Every conforming implementation MUST represent the complete Scorium
@@ -201,4 +201,4 @@ kind of repo-proximity coupling `scorium-spec` exists to avoid (see
 ## Open questions
 
 - Duration arithmetic/comparison across units (see above) needs
-  confirmation against `scorium-rust` behavior, not assumption.
+  confirmation against `scorium-rs` behavior, not assumption.

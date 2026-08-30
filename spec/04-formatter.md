@@ -1,6 +1,6 @@
 # 4. Canonical formatter behavior
 
-**Status: first full draft, language version `0.1.0-draft`. Normative for
+**Status: first full draft, language version `0.2.0-draft`. Normative for
 any implementation that claims to provide `fmt`. Derived from
 `crates/scorium-format/src/printer.rs`.**
 
@@ -84,7 +84,7 @@ formatter, regardless of whether providing one is mandatory.
   print their literal parts verbatim and re-emit `$name` for each
   interpolation part.
 - Lists print as `[a, b, c]` — comma-space separated, no trailing comma,
-  no line-wrapping in `0.1.0-draft` (line-width/wrapping behavior is an
+  no line-wrapping in `0.2.0-draft` (line-width/wrapping behavior is an
   open question, not yet defined for any construct).
 
 ## Idempotency requirement
@@ -136,6 +136,6 @@ specifically to catch and prevent per-implementation formatting drift.
   or one an implementation may omit (see top of this file) — orthogonal to
   the point above: an implementation may still choose not to ship `fmt` at
   all, but if it does, its output is not allowed to be "its own version."
-- Line-width/wrapping rules — undefined in both `scorium-rust` and here.
+- Line-width/wrapping rules — undefined in both `scorium-rs` and here.
   Until defined, no construct that would need wrapping is fixture-testable
   for cross-implementation identity.

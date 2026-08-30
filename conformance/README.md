@@ -1,8 +1,8 @@
 # Conformance fixtures
 
-**Status: first full draft schema, language version `0.1.0-draft`. A real
-first batch of fixtures exists under `v0.1.0-draft/`, seeded directly from
-`scorium-rust`'s own test suite and examples — not invented.**
+**Status: first full draft schema, language version `0.2.0-draft`. A real
+first batch of 31 fixtures exists under `v0.2.0-draft/`, seeded directly
+from `scorium-rs`'s own test suite and examples — not invented.**
 
 ## Intent
 
@@ -158,7 +158,7 @@ tokens rather than hand them to a generic string-to-float parser.
 ## Entries: the shape of a whole evaluated document
 
 An evaluated Scorium document is **not** a `Value` — it's an ordered
-sequence of entries (leaves, nodes, includes; see `scorium-rust`'s own
+sequence of entries (leaves, nodes, includes; see `scorium-rs`'s own
 three-tier `ast::Item` / `Value` / `Entry` distinction, documented in its
 `entry.rs`). Squeezing it into a JSON object (`{"host": ..., "port":
 ...}`) is tempting for the common case but silently loses two things
@@ -197,7 +197,7 @@ Open questions).
 ## Open questions
 
 - Host-integration fixtures (ones needing host-registered
-  functions/values, e.g. `scorium-rust`'s `select()`/`notify()`-style
+  functions/values, e.g. `scorium-rs`'s `select()`/`notify()`-style
   tests) vs. pure-language fixtures: confirmed as two separate concerns.
   This batch is pure-language only; a host-integration corpus and its
   `hostcall`-entry encoding are undesigned.
