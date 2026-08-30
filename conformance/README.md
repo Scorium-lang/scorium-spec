@@ -1,14 +1,14 @@
 # Conformance fixtures
 
-**Status: first full draft schema, language version `0.2.0-draft`. A real
-first batch of 31 fixtures exists under `v0.2.0-draft/`, seeded directly
-from `scorium-rs`'s own test suite and examples — not invented.**
+**Status: stable schema for language version `0.2.0`. The corpus contains
+34 fixtures under `v0.2.0/`, grounded in verified implementation behavior
+and the normative decisions recorded by this specification.**
 
 ## Intent
 
 Each native implementation runs the same fixture corpus in its own CI,
 against whichever spec version it claims to support
-(`conformance/<version>/`). A fixture failure means that implementation is
+(`conformance/v<version>/`). A fixture failure means that implementation is
 not conformant at that version — not a bug report against the spec.
 
 Producing this JSON format is **not** something an implementation needs to
@@ -60,6 +60,27 @@ because the original three-file-per-fixture idea had nowhere to put a
 second `.scor` file, and `include` fixtures need at least two. A fixture
 uses exactly one of `source` or `files`+`entry`, never both.
 
+### Runtime options
+
+A parser/evaluator fixture MAY carry an `options` object that overrides only
+the limits needed by that fixture:
+
+```json
+{
+  "name": "loop budget is enforced",
+  "source": "while true do\nend",
+  "options": { "max_loop_iterations": 16 },
+  "expect_error": { "code": "scorium::eval::loop_budget_exceeded" }
+}
+```
+
+Recognized keys are `max_loop_iterations`, `max_function_call_depth`,
+`max_script_instructions`, and `max_script_memory_bytes`. Values are
+non-negative JSON integers; all except `max_script_memory_bytes` MUST be
+greater than zero. An omitted key uses the implementation's default. This
+keeps limit fixtures fast and deterministic without making implementation
+defaults part of the language contract.
+
 ### Diagnostics fixtures
 
 ```json
@@ -94,11 +115,10 @@ exactly (idempotency, §4).
 ### The `requires` escape hatch
 
 Any fixture MAY carry `"requires": ["lua"]` (default: absent, meaning "no
-implementation-capability requirement"). This exists so a future
-Lua-dependent (Full-level, §7) fixture has somewhere to declare that
-dependency without baking the Portable/Full split into this schema before
-§7 is settled. No fixture in the current batch uses it — the first batch
-is deliberately pure Portable-level language core.
+implementation-capability requirement"). This allows a Lua-dependent fixture
+to declare its capability without baking Section 7's unapproved level names
+into the schema. No `0.2.0` fixture uses it; the current corpus tests the
+language core available without Lua execution.
 
 ## Tagged value encoding
 
@@ -189,23 +209,15 @@ So a whole-document (or whole-node-body) result is its own tagged form,
 ```
 
 `header` is `null` when the node has none, otherwise the header string.
-A `hostcall` kind (for `Entry::HostCall`, host-integration results) is
-not yet defined here — no fixture in this batch needs it, since
-host-integration fixtures are a separate, not-yet-designed corpus (see
-Open questions).
 
-## Open questions
+## Version 0.2.0 corpus scope
 
-- Host-integration fixtures (ones needing host-registered
-  functions/values, e.g. `scorium-rs`'s `select()`/`notify()`-style
-  tests) vs. pure-language fixtures: confirmed as two separate concerns.
-  This batch is pure-language only; a host-integration corpus and its
-  `hostcall`-entry encoding are undesigned.
-- Fixtures needing non-default runtime options (e.g. a small
-  `max_loop_iterations` to make a budget test fast) aren't supported by
-  this schema yet — the two `sandbox/` fixtures in this batch instead
-  rely on tripping the *default* limits, which is slower but needs no new
-  schema field. An `"options"` override field is a plausible future
-  addition, not added speculatively here.
-- A `portable`/`full` split (§7) is intentionally deferred to `requires`
-  rather than a first-class field, per the decision above.
+The `0.2.0` corpus covers pure-language parsing, evaluation, diagnostics,
+formatting, and sandbox limits. Host-integration calls and their
+implementation-specific result entries are outside this corpus version, so
+no `hostcall` entry encoding is defined. A future language version MAY add a
+separate host-integration fixture category without changing the meaning of
+the `0.2.0` fixtures.
+
+Capability requirements remain a string list rather than named conformance
+levels. Section 7 is informative and cannot change how `requires` is decoded.

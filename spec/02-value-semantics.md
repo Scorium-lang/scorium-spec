@@ -1,6 +1,6 @@
 # 2. Value semantics
 
-**Status: first full draft, language version `0.2.0-draft`. Normative.
+**Status: stable and normative for language version `0.2.0`.
 Derived from `scorium-rs`'s `Value` type and evaluator
 (`crates/scorium-core/src/value.rs`, `crates/scorium-lua/src/eval.rs`).**
 
@@ -17,7 +17,7 @@ Value ::= Int(i64-range integer)
         | List(Value*)
 ```
 
-Eight value types, no others, for `0.2.0-draft`. An implementation MUST
+Eight value types, no others, for `0.2.0`. An implementation MUST
 keep `Int` and `Float` distinct representations — collapsing both into one
 numeric type (as a prototype implementation might, for convenience) is a
 non-conformant simplification, because it silently changes arithmetic and
@@ -151,20 +151,17 @@ not their language default.
 
 Calling any other method name on a color, or calling a color method with
 the wrong argument count/type, MUST raise `scorium::eval::type_error`.
-No other value type has methods in `0.2.0-draft`.
+No other value type has methods in `0.2.0`.
 
 ## Duration semantics
 
-A duration is `(amount: f64, unit)`. There is no implicit conversion
-between units at the value level — `as_millis()`-style normalization (for
-comparison or host consumption) is a host/runtime convenience, not
-something the language does implicitly to two durations with different
-units in an expression. (Whether durations of different units can be
-compared/added at all in `0.2.0-draft` is unresolved — `scorium-rs`'s
-current evaluator does not appear to define duration arithmetic; treat
-duration values as opaque outside of construction and host consumption
-until this is confirmed against the reference implementation and stated
-here explicitly.)
+A duration is `(amount: f64, unit)`. There is no implicit conversion between
+units at the value level — `as_millis()`-style normalization is a host/runtime
+convenience, not a language operation. Equality compares both fields exactly:
+`1s == 1s` is true, while `1s == 1000ms` is false. Ordered comparison and all
+arithmetic operators on durations MUST raise `scorium::eval::type_error`.
+Duration values are otherwise opaque after construction and are intended for
+host consumption.
 
 ## Lists
 
@@ -197,8 +194,3 @@ docs, e.g. a future `scorium-js` implementation note — not here.) Adding
 implementation-technology prescriptions to this document is exactly the
 kind of repo-proximity coupling `scorium-spec` exists to avoid (see
 `README.md`).
-
-## Open questions
-
-- Duration arithmetic/comparison across units (see above) needs
-  confirmation against `scorium-rs` behavior, not assumption.

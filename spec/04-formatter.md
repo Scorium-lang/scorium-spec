@@ -1,15 +1,14 @@
 # 4. Canonical formatter behavior
 
-**Status: first full draft, language version `0.2.0-draft`. Normative for
+**Status: stable and normative for language version `0.2.0` for
 any implementation that claims to provide `fmt`. Derived from
 `crates/scorium-format/src/printer.rs`.**
 
 ## Whether formatting is required
 
-Not yet decided at the spec level (see Open questions in `00-overview.md`
-territory) — recorded here as still open rather than assumed. This
-section specifies the canonical output *when* an implementation provides a
-formatter, regardless of whether providing one is mandatory.
+Providing a formatter is optional in language version `0.2.0`. An
+implementation that exposes `fmt`, `format`, or an equivalent formatter API
+MUST follow this entire section and the formatter fixtures.
 
 ## Structural rules
 
@@ -83,16 +82,15 @@ formatter, regardless of whether providing one is mandatory.
 - String literals: quoted strings re-escape `" \ \n \t \r`; bare strings
   print their literal parts verbatim and re-emit `$name` for each
   interpolation part.
-- Lists print as `[a, b, c]` — comma-space separated, no trailing comma,
-  no line-wrapping in `0.2.0-draft` (line-width/wrapping behavior is an
-  open question, not yet defined for any construct).
+- Lists print as `[a, b, c]` — comma-space separated, no trailing comma.
+- Version `0.2.0` performs no automatic line wrapping for any construct,
+  regardless of line length.
 
 ## Idempotency requirement
 
 Formatting output that is already canonical MUST be a no-op (byte-for-byte
 identical). This is the property `fmt --check` relies on and MUST hold for
-every conformance fixture that has a `.expect.json`-adjacent canonical
-`.scor` form (see `conformance/README.md`).
+every formatter fixture's `output` string (see `conformance/README.md`).
 
 ## Cross-implementation conformance (resolved: unified, not per-language)
 
@@ -114,28 +112,16 @@ Concretely, for any implementation that provides `fmt`:
   to every other conforming implementation's output — not merely
   idempotent within itself.
 - The conformance fixture corpus (`conformance/README.md`) MUST include a
-  `formatter/` category of golden `.scor` files that every implementation
-  claiming `fmt` support runs its formatter against and diffs
-  byte-for-byte, not just a per-implementation idempotency self-check.
-- Any rule this document leaves genuinely undefined (line-width/wrapping,
-  see below) blocks a construct from being fixture-tested for
-  cross-implementation identity until it's pinned down — an implementation
-  is free to pick *a* behavior for an undefined case today, but MUST
-  expect that behavior to possibly need to change once the rule is
-  formalized, and MUST NOT treat its own current choice as already
-  normative.
-
+  `formatter/` category of golden `input`/`output` strings that every
+  implementation claiming formatter support compares byte-for-byte, not just
+  a per-implementation idempotency self-check.
 This resolves the earlier open question in the other direction from a
 weaker "idempotent per-implementation only" reading: cross-language byte
 identity is the goal, and formatter conformance fixtures exist
 specifically to catch and prevent per-implementation formatting drift.
 
-## Open questions
+## Version scope
 
-- Whether `fmt` is a mandatory capability for every native implementation,
-  or one an implementation may omit (see top of this file) — orthogonal to
-  the point above: an implementation may still choose not to ship `fmt` at
-  all, but if it does, its output is not allowed to be "its own version."
-- Line-width/wrapping rules — undefined in both `scorium-rs` and here.
-  Until defined, no construct that would need wrapping is fixture-testable
-  for cross-implementation identity.
+Future language versions MAY introduce an explicit wrapping option. Such an
+option cannot change the default `0.2.0` output retroactively and requires
+versioned conformance fixtures before it becomes normative.

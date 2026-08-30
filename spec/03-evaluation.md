@@ -1,9 +1,8 @@
 # 3. Evaluation rules
 
-**Status: first full draft, language version `0.2.0-draft`. Normative for
-the Portable level (see §7); `script {}` execution semantics belong to Lua
-itself and are out of scope here beyond the boundary rules stated below.
-Derived from `crates/scorium-lua/src/eval.rs` and `runtime.rs`.**
+**Status: stable and normative for language version `0.2.0`. Lua's own
+semantics are out of scope; the `script {}` boundary is specified below.
+Derived from `scorium-rs` and cross-checked against `scorium-js`.**
 
 ## Identifier and interpolation resolution
 
@@ -61,16 +60,28 @@ that is not `Color`, MUST raise `scorium::eval::type_error`.
   values (not necessarily a `Bool`) — `Lua`-style: `a or b` yields `a` if
   `a` is truthy, else evaluates and yields `b`; `a and b` yields `a` if `a`
   is falsy, else evaluates and yields `b`.
-- `return [expr]` inside a `fn` body exits with that value (`Nil` if
-  omitted); outside a function body `return` is a parse-time construct
-  only reachable inside `fn` (grammar-level, not evaluation-level,
-  restriction — to be confirmed and pinned down in §1 once verified).
+- `return [expr]` exits the innermost executing Scorium function with that
+  value (`Nil` if omitted), including from nested control flow or a node body.
+  Evaluating `return` while no Scorium function call is active MUST raise
+  `scorium::eval::return_outside_function`.
+
+## Evaluation order
+
+Documents, node bodies, and executed control-flow bodies evaluate items in
+source order. A node header is a literal string, not an expression, so it has
+no evaluation effects. The node body is evaluated before its resulting node
+entry is appended to the parent output.
+
+Expression operands and function arguments evaluate left to right. The only
+operator exceptions are `and` and `or`, which evaluate the right operand only
+when required by their short-circuit rules. An `include` executes at its
+source position before evaluation continues with the following item.
 
 ## Resource limits (sandbox knobs, evaluation-visible)
 
-Four **required configurable limits** — every implementation MUST expose
-each as a host-settable knob and MUST enforce it, regardless of what
-default value it picks:
+Every evaluator MUST expose the first two limits below as host-settable knobs
+and enforce them. An implementation that executes `script {}` MUST also
+expose and enforce the two script-runtime limits:
 
 - **Loop iterations** — total `for`/`while` iterations allowed across one
   evaluation. `scorium-rs` default: `1_000_000`. Exceeding it MUST
@@ -79,20 +90,17 @@ default value it picks:
   `scorium-rs` default: `256`. Exceeding it MUST raise
   `scorium::eval::call_depth_exceeded`, naming the limit.
 - **Script instruction count** — VM instructions allowed per `script {}`
-  block (Full-level implementations only, §7). `scorium-rs` default:
-  `50_000_000`.
-- **Script memory** — bytes the script runtime may allocate (Full-level
-  only). `scorium-rs` default: `64 MiB`, `0` disables the cap.
+  block. `scorium-rs` default: `50_000_000`. Exceeding it MUST raise
+  `scorium::eval::script_error`.
+- **Script memory** — bytes the script runtime may allocate. `scorium-rs`
+  default: `64 MiB`; `0` disables the cap. Exceeding a nonzero cap MUST raise
+  `scorium::eval::script_error`.
 
-The existence of these four limits, the requirement that a host can
-configure each, and the requirement that exceeding one produces the
-defined diagnostic (not a crash, hang, or silent truncation) are
-normative — the *specific default numbers* are not: an implementation MAY
-ship different defaults. A future **compatibility profile** concept — a
-named, spec-defined set of pinned default values implementations can
-opt into for byte-for-byte behavioral comparison across languages — is
-worth considering once there's a concrete cross-implementation testing
-need for it, but is not defined in `0.2.0-draft`.
+The existence and configurability of the applicable limits and their defined
+diagnostics are normative. The specific default numbers are informative; an
+implementation MAY ship different defaults. Conformance fixtures that depend
+on a limit set it explicitly through the fixture `options` object and never
+assume an implementation default.
 
 A native implementation embedding a runtime without these checks (e.g.
 relying on the host language's own stack limit for recursion instead of
@@ -100,23 +108,14 @@ an explicit call-depth counter) is not conformant even if it happens not
 to crash on the conformance fixtures, since the diagnostic on exceeding
 the limit is itself part of the observable, testable contract.
 
-### Open: shared vs. independent depth budgets across the Lua boundary
+### Function-depth budget boundary
 
-Undecided. If a Scorium `fn` call reaches into a `script {}` body (via a
-host-registered Lua function, say) which itself calls back into Scorium
-evaluation (e.g. by invoking a host function that re-enters the
-evaluator), does that recursion draw from **one shared** call-depth
-budget across both the Scorium and Lua sides, or **two independent**
-budgets (a Scorium `fn`-depth counter and a separate Lua call-depth
-counter)? `scorium-rs`'s current `max_function_call_depth` only counts
-`call_user_fn` (pure Scorium `fn` recursion) — it does not appear to
-account for depth contributed by a round-trip through Lua at all, which
-means a Scorium→Lua→Scorium cycle could exceed any *intended* combined
-depth limit without tripping either counter. This needs a real decision,
-not an assumption, before `0.1.0`: a single shared budget is simpler to
-reason about and closes this gap directly; two independent budgets are
-easier to implement per-side but require an explicit design for how (or
-whether) they interact.
+The function-depth limit counts active Scorium `fn` calls within one
+evaluation. Lua VM frames do not consume this counter; they are bounded by the
+script instruction and memory limits. If a host callback starts a new Scorium
+evaluation, that evaluation owns a new function-depth counter. Hosts that
+permit arbitrary mutual re-entry are responsible for applying an additional
+outer re-entry limit appropriate to their capability model.
 
 ## `include`
 
@@ -135,9 +134,9 @@ whether) they interact.
 
 ## `script {}` boundary
 
-`script {}` bodies are raw Lua, executed by an embedded Lua VM under the
-sandbox limits in §6. This document does not specify Lua's own semantics
-(that's Lua's job) — only the boundary contract:
+When supported, `script {}` bodies are raw Lua executed by an embedded Lua VM
+under the sandbox limits in §6. This document does not specify Lua's own
+semantics — only the boundary contract:
 
 - Host functions/values registered through the shared registry (§6) MUST
   be reachable identically from both plain Scorium expressions and
@@ -145,19 +144,7 @@ sandbox limits in §6. This document does not specify Lua's own semantics
 - A runtime failure inside a script body surfaces as
   `scorium::eval::script_error` with the underlying message, not a raw,
   implementation-specific Lua error type leaking through.
-- Per §7 (conformance levels, proposal), a Portable-level implementation
-  that does not embed Lua MUST still parse `script {}` correctly (§1) and
-  raise a defined, distinct diagnostic when one is encountered at
-  evaluation time — never silently skip the block or treat its body as a
+- An implementation without Lua execution MUST raise
+  `scorium::eval::script_error` when evaluation reaches a script block and
+  MUST NOT execute it as another language, silently skip it, or treat it as a
   no-op.
-
-## Open questions
-
-- Exact evaluation order guarantees beyond what's stated above (e.g.
-  whether a node's header expression evaluates before or interleaved with
-  its first body item) are not yet pinned down and need conformance
-  fixtures that would actually distinguish the orders before they can be
-  made normative.
-- Whether `return` outside a `fn` body is a grammar-level parse error or
-  an evaluation-level error is unconfirmed against `scorium-rs`'s actual
-  behavior (see inline note above).

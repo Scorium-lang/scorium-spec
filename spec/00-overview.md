@@ -1,8 +1,7 @@
 # 0. Overview
 
-**Status: first full draft, language version `0.2.0-draft`. The design
-principle below is settled; unresolved project-level decisions are marked
-explicitly as open.**
+**Status: stable and normative for language version `0.2.0`, except where a
+section is explicitly marked informative or out of scope.**
 
 ## Purpose
 
@@ -26,35 +25,46 @@ demand, one format throughout — is what distinguishes Scorium from both
 "just a data format" (JSON/YAML/TOML) and "just an embedded scripting
 language with config-shaped output."
 
-This matters directly for how the rest of this document, especially §7
-(conformance levels), should be read: the native evaluation model in §3
+This matters directly for how the rest of this document should be read: the
+native evaluation model in §3
 — variables, expressions, conditionals, loops, user-defined `fn` — is
 **not** a lesser subset bolted on for portability's sake. It *is* the
 "becomes programmable" half of the core value proposition, and every
 implementation gets it natively, in its own language, with no embedded
 VM required. Raw `script {}` (Lua, §6) is an escape hatch beyond that —
-useful, and part of "Full" conformance — but an implementation that only
-reaches "Portable" has still delivered the actual design principle above,
-not a crippled placeholder waiting for Lua support. Language work
-(spec sections, conformance fixtures, implementation priority) should
-keep optimizing for this progressive readable-to-programmable path, not
-treat raw scripting as the feature the rest of the language merely leads
-up to.
+useful, but an optional execution capability in version `0.2.0`. An
+implementation without Lua execution has still delivered the actual design
+principle above, not a crippled placeholder waiting for Lua support. Language
+work (spec sections, conformance fixtures, implementation priority) should
+keep optimizing for this progressive readable-to-programmable path, not treat
+raw scripting as the feature the rest of the language merely leads up to.
 
-## What this spec must eventually pin down
+## Authority and normative scope
 
-- The name and version scheme for the language itself, independent of any
-  implementation's own release version (e.g. `scorium-rs` 0.1.0 implementing
-  language version `0.2.0-draft`).
-- Which sections are normative (MUST-level, testable by conformance
-  fixtures) versus informative (rationale, examples).
-- The relationship between this spec and `scorium-rs`: the Rust
-  implementation is the current reference implementation and initial source
-  of ground truth, but this document — once versioned 1.0 — is the
-  authority implementations conform to, not the Rust source.
+Sections 0–6 are the language contract for `0.2.0`. Statements using
+**MUST**, **MUST NOT**, **SHOULD**, or **MAY** are normative. Rationale,
+implementation examples, roadmap notes, and text explicitly labelled
+informative are not normative. Section 7 is an informative proposal and is
+not part of `0.2.0` conformance.
 
-## Open questions
+The Rust implementation is the reference implementation and the initial
+source of many rules, but this versioned specification is authoritative when
+they disagree. A divergence is a bug in the specification or implementation
+that must be resolved explicitly; implementations must not silently copy a
+different behavior.
 
-- RFC-style change process for the spec itself has not been decided.
-- Whether pre-1.0 spec versions carry any compatibility guarantee at all,
-  or are explicitly "may change under you" until 1.0.
+## Versioning and compatibility
+
+Language versions use Semantic Versioning independently of implementation
+package versions. For example, `scorium-rs` 0.1.1 may implement language
+version `0.2.0`.
+
+Before language version 1.0, a minor version MAY make incompatible language
+changes. A patch version MUST preserve valid programs and their observable
+behavior, except when correcting a security flaw or an internally
+contradictory rule that cannot be preserved safely. Additive clarifications
+and new fixtures for already-required behavior normally use a patch version.
+
+Changes are proposed and reviewed through GitHub issues and pull requests as
+described in `CONTRIBUTING.md`. A separate RFC document format is not required
+for `0.2.0`; a future process change does not alter this language version.

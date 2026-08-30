@@ -12,7 +12,7 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent.parent
 VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?")
-DRAFT_REFERENCE_PATTERN = re.compile(r"\b[0-9]+\.[0-9]+\.[0-9]+-draft\b")
+STALE_DRAFT_PATTERN = re.compile(r"\b[0-9]+\.[0-9]+\.[0-9]+-draft\b")
 LOCAL_LINK_PATTERN = re.compile(r"(?<!!)\[[^]]*\]\(([^)]+)\)")
 ERROR_CODE_PATTERN = re.compile(r"scorium::[a-z_]+::[a-z0-9_]+")
 INTEGER_PATTERN = re.compile(r"-?(?:0|[1-9][0-9]*)")
@@ -29,6 +29,12 @@ FIXTURE_CATEGORIES = {
     "values",
 }
 VALUE_TYPES = {"int", "float", "bool", "nil", "string", "color", "duration", "list"}
+RUNTIME_OPTIONS = {
+    "max_loop_iterations",
+    "max_function_call_depth",
+    "max_script_instructions",
+    "max_script_memory_bytes",
+}
 
 errors: list[str] = []
 
@@ -175,10 +181,23 @@ def validate_fixture(path: Path, fixture: object) -> str | None:
                 error(path, f"{field} must be a string")
         return name
 
-    allowed = {"name", "source", "files", "entry", "expect", "expect_error", "requires"}
+    allowed = {"name", "source", "files", "entry", "expect", "expect_error", "requires", "options"}
     unknown = set(fixture) - allowed
     if unknown:
         error(path, f"fixture has unknown keys: {sorted(unknown)}")
+
+    options = fixture.get("options")
+    if options is not None:
+        if not isinstance(options, dict):
+            error(path, "options must be an object")
+        else:
+            unknown_options = set(options) - RUNTIME_OPTIONS
+            if unknown_options:
+                error(path, f"options has unknown keys: {sorted(unknown_options)}")
+            for option, value in options.items():
+                minimum = 0 if option == "max_script_memory_bytes" else 1
+                if type(value) is not int or value < minimum:
+                    error(path, f"options.{option} must be an integer >= {minimum}")
 
     has_source = "source" in fixture
     has_files = "files" in fixture or "entry" in fixture
@@ -243,7 +262,7 @@ def main() -> int:
     current_docs = [ROOT / "README.md", ROOT / "conformance" / "README.md"]
     current_docs.extend(sorted((ROOT / "spec").glob("*.md")))
     for path in current_docs:
-        for reference in DRAFT_REFERENCE_PATTERN.findall(path.read_text(encoding="utf-8")):
+        for reference in STALE_DRAFT_PATTERN.findall(path.read_text(encoding="utf-8")):
             if reference != version:
                 error(path, f"stale language-version reference {reference!r}; current is {version!r}")
 

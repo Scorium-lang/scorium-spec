@@ -1,18 +1,15 @@
 # 1. Lexical structure and grammar
 
-**Status: first full draft, language version `0.2.0-draft`. Normative for
-implementations targeting this version. Derived from `scorium-rs`'s
-parser (`crates/scorium-core/src/{lexer,parser}.rs`, documented in
-`scorium-rs/docs/GRAMMAR.md`) as initial ground truth — not yet
-cross-checked against a second implementation, so treat as draft until
-`scorium-go` has attempted to conform to it.**
+**Status: stable and normative for language version `0.2.0`. Derived from
+`scorium-rs`'s parser (`crates/scorium-core/src/{lexer,parser}.rs`) and
+cross-checked by `scorium-js` against the shared conformance corpus.**
 
 Notation is extended-BNF-ish, written for readability over formality.
 `{ x }` means zero or more; `[ x ]` means optional; alternatives are
 separated by `|`.
 
 Every implementation MUST accept and reject input identically per this
-grammar for language version `0.2.0-draft`. Where behavior described here
+grammar for language version `0.2.0`. Where behavior described here
 turns out to diverge from what `scorium-rs` actually does, that is a bug
 to fix explicitly (in the spec or in `scorium-rs`), not something a new
 implementation should silently match by copying Rust's behavior without
@@ -43,7 +40,7 @@ expected (after `=`, inside a list, as a function argument). A `#` starting
 a token where a statement or value is not expected begins a line comment.
 
 Block comments do not nest (nesting is explicitly out of scope for
-`0.2.0-draft` — see Roadmap alignment below).
+`0.2.0` — see Roadmap alignment below).
 
 ### Identifiers and markers
 
@@ -170,14 +167,20 @@ script_block ::= 'script' '{' raw_lua_text '}'
 call_stmt  ::= expr_call                # a call used as a statement
 ```
 
-A `fn` body is ordinary Scorium items, not Lua. `return` exits the function
-and may carry a value. A `script { }` body is raw Lua text handed verbatim
-to a sandboxed Lua runtime — it MUST NOT be transpiled or reformatted.
-`script { }` is scoped separately in §7 (conformance levels): an
-implementation that does not embed Lua is not required to execute this
-production, but MUST still parse and recognize it in order to emit the
-correct diagnostic per §5, rather than failing generically or silently
-skipping it.
+A `fn` body is ordinary Scorium items, not Lua. `return` exits the innermost
+executing Scorium function, including from a nested conditional, loop, or
+node body, and may carry a value. A `return` outside a function is invalid and
+MUST raise `scorium::eval::return_outside_function`; it must never silently
+truncate document or node evaluation.
+
+A `script { }` body is raw Lua text handed verbatim to a sandboxed Lua
+runtime — it MUST NOT be transpiled or reformatted. Lua execution is an
+optional implementation capability in `0.2.0`. An implementation without it
+MUST still parse, preserve, and format the production and MUST raise
+`scorium::eval::script_error` when evaluation reaches it, rather than failing
+generically, executing the body as its host language, or silently skipping
+it. Section 7 discusses a possible future naming scheme for capabilities but
+is not normative.
 
 ### Includes
 
@@ -219,7 +222,7 @@ escape     ::= '\' ('"' | '\' | 'n' | 't' | 'r')
 
 `$name` interpolation is allowed **only** inside a bare string. Inside a
 quoted string, `$name` is literal text. Escapes beyond `\" \\ \n \t \r`
-(e.g. `\u{...}`) are out of scope for `0.2.0-draft`.
+(e.g. `\u{...}`) are out of scope for `0.2.0`.
 
 ### Identifier resolution
 
@@ -281,7 +284,7 @@ namespace defined in §5).
 
 ---
 
-## Roadmap alignment for `0.2.0-draft`
+## Roadmap alignment for `0.2.0`
 
 Explicitly out of scope for this spec version (tracked as future spec
 versions once there is a concrete need, not implied by their absence
@@ -298,12 +301,14 @@ here):
 - String escapes beyond `\" \\ \n \t \r`.
 - Block-comment nesting and comment tracking inside expressions/lists.
 
-## Open questions
+## Error recovery and portability
 
-- Whether this spec fixes a concrete lexer error-recovery model, or only
-  successful-parse behavior (error message *text* is diagnostics' concern
-  per §5, but error *sites* — where parsing must fail — are grammar's, and
-  are not yet exhaustively enumerated here).
-- This draft has not yet been checked against a second parser
-  implementation; until `scorium-go` attempts conformance, treat every
-  production above as "believed correct," not "proven portable."
+Version `0.2.0` standardizes which inputs are accepted, the diagnostic code
+for specified failures, and the requirement that a diagnostic carry a span.
+Recovery after the first syntax error, the number of additional diagnostics,
+and exact recovery spans are implementation behavior. A parser MAY stop at
+the first error. Message text is governed by §5.
+
+The grammar has been exercised by independent Rust and TypeScript parsers.
+Conformance is determined by this document and the fixtures, not by matching
+either parser's internal structure.

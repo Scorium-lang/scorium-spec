@@ -1,7 +1,7 @@
 # 5. Diagnostic model
 
-**Status: first full draft, language version `0.2.0-draft`. The code
-catalog below is normative; message text and rendering are not. Derived
+**Status: stable for language version `0.2.0`. The code catalog and minimum
+structure below are normative; message text and rendering are not. Derived
 from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
 `crates/scorium-lua/src/error.rs` (eval), and
 `crates/scorium-schema/src/error.rs` (schema).**
@@ -16,10 +16,9 @@ from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
   A different implementation is free to render differently, or to
   translate message text, as long as the code and the required structured
   fields (below) are present.
-- **Which fields a diagnostic carries** (e.g. `name`, `span`, `suggestion`)
-  is effectively normative in practice, since conformance fixtures will
-  assert on them — even though this document doesn't yet formally mark
-  per-code field contracts.
+- Fields beyond the minimum structure below, such as `name` and
+  `suggestion`, are optional implementation metadata in `0.2.0` unless the
+  code catalog explicitly requires them.
 
 ## Required structure
 
@@ -35,13 +34,12 @@ Every diagnostic MUST carry, at minimum:
 
 Restated from the multi-language discussion because it is easy to violate
 silently in a new implementation: any construct an implementation does not
-support (whether a genuinely unimplemented feature, or — per the §7
-conformance-levels proposal — a `script {}` block in a Portable-only
-implementation) MUST raise a diagnostic with a defined code. Silently
+support (including `script {}` execution in an implementation without Lua)
+MUST raise a diagnostic with a defined code. Silently
 ignoring, no-op'ing, or best-effort-guessing a value for an unsupported
 construct is non-conformant regardless of how reasonable the guess is.
 
-## Code catalog (language version `0.2.0-draft`)
+## Code catalog (language version `0.2.0`)
 
 ### `scorium::lex::*`
 
@@ -68,6 +66,7 @@ construct is non-conformant regardless of how reasonable the guess is.
 |---|---|
 | `scorium::eval::undefined_interpolation` | `$name` with no matching `@`-variable |
 | `scorium::eval::unknown_function` | a call to a name that is neither a host function nor a Scorium `fn` |
+| `scorium::eval::return_outside_function` | `return` evaluated while no Scorium function call is active |
 | `scorium::eval::type_error` | an operation applied to a value type it doesn't support (arithmetic, comparison, member access, call arity/type) |
 | `scorium::eval::division_by_zero` | `/` or `%` with a zero divisor |
 | `scorium::eval::arithmetic_overflow` | checked integer `+ - *` (or unary `-`) overflows `i64` range |
@@ -76,7 +75,7 @@ construct is non-conformant regardless of how reasonable the guess is.
 | `scorium::eval::include_cycle` | see note above |
 | `scorium::eval::include_io` | the included file could not be read |
 | `scorium::eval::include_parse` | the included file failed to parse |
-| `scorium::eval::script_error` | a `script {}` body raised a runtime error |
+| `scorium::eval::script_error` | script execution is unsupported, failed, or exceeded a script-runtime limit |
 | `scorium::eval::loop_budget_exceeded` | total loop iterations exceeded the configured limit |
 | `scorium::eval::call_depth_exceeded` | `fn` call nesting exceeded the configured limit |
 
@@ -103,20 +102,18 @@ in the reference implementation — defined but never raised. This is not
 two distinct real conditions, just one live diagnostic and one vestigial
 duplicate.
 
-**Normative for `0.2.0-draft`: `scorium::eval::include_cycle` is the only
+**Normative for `0.2.0`: `scorium::eval::include_cycle` is the only
 include-cycle code.** `scorium::include::cycle` MUST NOT be treated as
 part of the spec — a new implementation should not invent a
 parse-time-vs-eval-time distinction here that doesn't actually exist in
 the reference behavior. (Separately, `scorium-rs` itself carries dead
 code defining the unused variant — worth a small cleanup there at some
 point, but that's a `scorium-rs` housekeeping change, not a spec
-concern, and out of scope for this drafting pass.)
+concern, and out of scope for this specification version.)
 
-## Open questions
+## Message language and additional fields
 
-- Whether per-code required-field contracts (e.g. "`unknown_node` MUST
-  carry an optional `suggestion` field when a close match exists") should
-  be made explicit and testable, versus left as "whatever fields happen to
-  exist today."
-- i18n/locale of message text: presumed out of scope (codes are the
-  contract) but not explicitly ruled on.
+Implementations MAY localize diagnostic messages and help text. Codes remain
+ASCII and stable across locales. Additional structured fields are encouraged
+for tooling but are not cross-language conformance requirements in `0.2.0`,
+except that `duplicate_key` carries both relevant spans as stated above.
