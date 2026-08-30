@@ -1,35 +1,32 @@
 # Changelog
 
-## 0.2.0-draft — unreleased
+## [0.2.0] - 2026-08-30
 
-All seven spec sections (`00`–`07`) are now first full drafts grounded
-directly in `scorium-rs`'s source (not just its prose docs), each
-flagging what's normative vs. still open. Highlights: `%` defined by
-Euclidean-remainder formula independent of any host language's native
-operator; `Int`/`Float` comparison and equality defined exactly (no
-`(n as f64) == f`-style precision loss); numeric-range conformance stated
-as an outcome (exact `i64` domain representation), not tied to any one
-representation technology; canonical formatter output declared
-byte-identical across implementations, not just idempotent per
-implementation; `include` path containment required on the canonical
-(symlink-resolved) path, not the textual one; resolved a real
-`scorium-rs` inconsistency (`scorium::include::cycle` was dead code —
-only `scorium::eval::include_cycle` is normative).
+First stable language specification. Sections `00`–`06` are normative for
+Scorium `0.2.0`; Section `07` remains an informative, unapproved proposal.
 
-Added the conformance fixture encoding (tagged semantic values; a
-dedicated `entries` shape for whole-document evaluation results, since a
-plain JSON object can't represent repeated same-named nodes or headers;
-source-to-source byte fixtures for the formatter) and a first batch of 31
-fixtures across values/evaluation/diagnostics/formatter/sandbox, seeded
-from `scorium-rs`'s own tests and examples and empirically verified
-against a live build of `scorium-rs` — all 31 matched on the first run,
-including one case (`formatter/float-whole-number-keeps-decimal`) not
-covered by any existing `scorium-rs` test.
+Highlights: `%` is defined by a Euclidean-remainder formula independent of
+any host language's native operator; `Int`/`Float` comparison and equality
+are exact; every implementation represents the complete signed 64-bit `Int`
+domain; canonical formatter output is byte-identical across implementations;
+and include containment is enforced on canonical, symlink-resolved paths.
 
-Prepared the specification as a standalone public repository with accurate
-landing documentation, shared project terms, contribution and security
-guidance, GitHub templates, and automated validation of version references,
-fixtures, and local documentation links.
+The stable contract also defines duration equality and rejects duration
+arithmetic/ordering, fixes item and expression evaluation order, rejects
+`return` outside a function, makes formatter and Lua-execution capabilities
+explicit, defines the Lua sandbox outcome independently of VM module names,
+and scopes function-depth counters to one Scorium evaluation.
+
+Added the conformance fixture encoding: tagged semantic values, a dedicated
+`entries` shape for whole-document evaluation results, source-to-source byte
+fixtures for the formatter, capability requirements, and deterministic
+per-fixture runtime-limit options. The versioned corpus contains 34 fixtures
+across values, evaluation, diagnostics, formatting, and sandbox behavior.
+
+Prepared the specification as a standalone public repository with shared
+project terms, contribution and security guidance, GitHub templates, and
+automated validation of version references, fixtures, and documentation
+links.
 
 ## 0.1.0-draft — unreleased
 
@@ -37,3 +34,5 @@ Initial skeleton. No normative content yet: section stubs only, seeded from
 the current `scorium-rs` documentation (`docs/GRAMMAR.md`,
 `docs/LANGUAGE.md`, `docs/DIAGNOSTICS.md`, `docs/ROADMAP.md`) as informative
 source material, not as authoritative text.
+
+[0.2.0]: https://github.com/Scorium-lang/scorium-spec/releases/tag/v0.2.0

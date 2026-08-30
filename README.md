@@ -1,8 +1,8 @@
 # Scorium language specification
 
 [![CI](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml/badge.svg)](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml)
-[![Language version](https://img.shields.io/badge/language-0.2.0--draft-8EDDFF?style=flat-square)](./VERSION)
-[![Status](https://img.shields.io/badge/status-draft-8EDDFF?style=flat-square)](./CHANGELOG.md)
+[![Language version](https://img.shields.io/badge/language-0.2.0-8EDDFF?style=flat-square)](./VERSION)
+[![Status](https://img.shields.io/badge/status-stable%20pre--1.0-8EDDFF?style=flat-square)](./CHANGELOG.md)
 [![Source Available](https://img.shields.io/badge/source-available-8EDDFF?style=flat-square)](./LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/Scorium-lang/scorium-spec?style=flat-square&logo=github)](https://github.com/Scorium-lang/scorium-spec/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/Scorium-lang/scorium-spec?style=flat-square&logo=github)](https://github.com/Scorium-lang/scorium-spec/issues)
@@ -38,16 +38,15 @@ end
 
 ## Current status
 
-The current language version is **`0.2.0-draft`**. Sections 1–6 are first
-full normative drafts grounded in the behavior of the Rust reference
-implementation and exercised by the TypeScript implementation. Section 0
-contains the settled design principle and remaining project-level questions.
-Section 7 is an unapproved proposal and is not part of the language contract.
+The current language version is **`0.2.0`**. Sections 0–6 are stable and
+normative for that version, grounded in the Rust reference implementation and
+cross-checked with the native TypeScript implementation. Section 7 is an
+informative, unapproved proposal and is not part of the language contract.
 
-The repository currently contains **31 conformance fixtures** across values,
-evaluation, diagnostics, formatting, and sandbox behavior. Draft means the
-language can still change before 1.0; it does not mean the documents or
-fixtures are placeholders.
+The repository contains **34 conformance fixtures** across values,
+evaluation, diagnostics, formatting, and sandbox behavior. Scorium remains
+pre-1.0, so a future minor language version may make incompatible changes;
+version `0.2.0` itself is no longer a draft.
 
 ## Specification
 
@@ -81,13 +80,13 @@ not from implementations sharing source code or release schedules.
 
 An implementation version and a language version are separate. For example,
 an implementation may release version `0.9.0` while declaring support for
-language version `0.2.0-draft`.
+language version `0.2.0`.
 
 ## Repository layout
 
 - `spec/` — one specification document per language concern.
 - `conformance/` — fixture format and versioned fixture corpora.
-- `VERSION` — current draft language version.
+- `VERSION` — current language version.
 - `CHANGELOG.md` — language-version history.
 
 ## Contributing and security

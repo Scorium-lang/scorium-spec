@@ -60,8 +60,8 @@ negative fixture where the fixture schema can represent one.
 
 `VERSION` contains the current language version. Clarifications that do not
 change observable behavior normally do not require a bump. A significant or
-breaking language change must advance the draft version by one appropriate
-SemVer step and must also:
+breaking language change must advance the version by one appropriate SemVer
+step and must also:
 
 - create or rename the matching `conformance/v<version>/` directory;
 - update version references in the normative documents;

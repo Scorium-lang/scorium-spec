@@ -11,5 +11,9 @@ CLAUDE.md
 .zed/
 *.iml
 
+# Python validator cache
+__pycache__/
+*.py[cod]
+
 # OS metadata
 .DS_Store

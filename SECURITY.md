@@ -32,7 +32,7 @@ contract should be reported privately to that implementation's repository.
 
 ## Supported versions
 
-The latest draft on `main` receives security corrections. Earlier draft
+The latest language version on `main` receives security corrections. Earlier
 versions and historical tags do not currently receive backports.
 
 Security corrections may intentionally land with limited detail until

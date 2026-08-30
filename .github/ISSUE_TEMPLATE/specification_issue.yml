@@ -27,7 +27,7 @@ body:
     id: version
     attributes:
       label: Language version
-      placeholder: 0.2.0-draft
+      placeholder: 0.2.0
     validations:
       required: true
 
