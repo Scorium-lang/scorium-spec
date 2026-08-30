@@ -47,11 +47,11 @@ implementation examples, roadmap notes, and text explicitly labelled
 informative are not normative. Section 7 is an informative proposal and is
 not part of `0.2.0` conformance.
 
-The Rust implementation is the reference implementation and the initial
-source of many rules, but this versioned specification is authoritative when
-they disagree. A divergence is a bug in the specification or implementation
-that must be resolved explicitly; implementations must not silently copy a
-different behavior.
+No host-language implementation is the reference or authority for Scorium.
+This versioned specification and its conformance fixtures define the shared
+contract. A divergence is a bug in the specification, fixtures, or an
+implementation that must be resolved explicitly; implementations must not
+silently copy a different behavior.
 
 ## Versioning and compatibility
 

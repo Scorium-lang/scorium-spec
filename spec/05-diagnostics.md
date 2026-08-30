@@ -96,9 +96,9 @@ construct is non-conformant regardless of how reasonable the guess is.
 `SyntaxError::IncludeCycle` (`scorium::include::cycle`, in
 `scorium-core/src/diagnostic.rs`) and `EvalErrorKind::IncludeCycle`
 (`scorium::eval::include_cycle`, in `scorium-lua/src/error.rs`). Checking
-actual usage: only `EvalErrorKind::IncludeCycle` is ever constructed (at
-`scorium-lua/src/eval.rs:337`); `SyntaxError::IncludeCycle` is dead code
-in the reference implementation — defined but never raised. This is not
+actual usage: only `EvalErrorKind::IncludeCycle` is ever constructed;
+`SyntaxError::IncludeCycle` is dead code in that implementation — defined
+but never raised. This is not
 two distinct real conditions, just one live diagnostic and one vestigial
 duplicate.
 
@@ -106,7 +106,7 @@ duplicate.
 include-cycle code.** `scorium::include::cycle` MUST NOT be treated as
 part of the spec — a new implementation should not invent a
 parse-time-vs-eval-time distinction here that doesn't actually exist in
-the reference behavior. (Separately, `scorium-rs` itself carries dead
+the verified behavior. (Separately, `scorium-rs` itself carries dead
 code defining the unused variant — worth a small cleanup there at some
 point, but that's a `scorium-rs` housekeeping change, not a spec
 concern, and out of scope for this specification version.)

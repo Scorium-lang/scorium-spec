@@ -39,9 +39,9 @@ end
 ## Current status
 
 The current language version is **`0.2.0`**. Sections 0–6 are stable and
-normative for that version, grounded in the Rust reference implementation and
-cross-checked with the native TypeScript implementation. Section 7 is an
-informative, unapproved proposal and is not part of the language contract.
+normative for that version, with behavior verified independently by the Rust
+and TypeScript/JavaScript implementations. Section 7 is an informative,
+unapproved proposal and is not part of the language contract.
 
 The repository contains **34 conformance fixtures** across values,
 evaluation, diagnostics, formatting, and sandbox behavior. Scorium remains
@@ -73,7 +73,11 @@ not from implementations sharing source code or release schedules.
 
 ## Implementations
 
-- [`scorium-rs`](https://github.com/Scorium-lang/scorium-rs) — Rust reference
+Scorium belongs to no single host language. Every implementation is a peer:
+it targets the same specification, proves compatibility with the shared
+fixtures, and exposes APIs suited to its own ecosystem.
+
+- [`scorium-rs`](https://github.com/Scorium-lang/scorium-rs) — native Rust
   implementation, including the Lua execution surface.
 - [`scorium-js`](https://github.com/Scorium-lang/scorium-js) — native
   TypeScript/JavaScript implementation of the non-Lua language core.
