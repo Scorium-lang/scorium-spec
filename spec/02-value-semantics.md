@@ -109,7 +109,7 @@ MUST NOT be reimplemented as C-style falsy-zero.
        equal.
 
   See `scorium-rs`'s `cmp_int_float` for one worked implementation of
-  steps 3–4 (its range checks and step 2's infinity handling collapse
+  steps 3-4 (its range checks and step 2's infinity handling collapse
   into the same bounds test, since `±Infinity` already falls outside the
   `i64`-representable range).
 - Any comparison against `NaN` (ordered `< > <= >=`) MUST evaluate to

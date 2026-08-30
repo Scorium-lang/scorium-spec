@@ -41,7 +41,7 @@ raw scripting as the feature the rest of the language merely leads up to.
 
 ## Authority and normative scope
 
-Sections 0–6 are the language contract for `0.2.0`. Statements using
+Sections 0-6 are the language contract for `0.2.0`. Statements using
 **MUST**, **MUST NOT**, **SHOULD**, or **MAY** are normative. Rationale,
 implementation examples, roadmap notes, and text explicitly labelled
 informative are not normative. Section 7 is an informative proposal and is

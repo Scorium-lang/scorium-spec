@@ -1,8 +1,14 @@
 # Changelog
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+This records language-version history, distinct from any implementation's
+own package-version changelog.
+
+## [Unreleased]
+
 ## [0.2.0] - 2026-08-30
 
-First stable language specification. Sections `00`–`06` are normative for
+First stable language specification. Sections `00`-`06` are normative for
 Scorium `0.2.0`; Section `07` remains an informative, unapproved proposal.
 
 Highlights: `%` is defined by a Euclidean-remainder formula independent of

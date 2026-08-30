@@ -21,7 +21,7 @@ target language.
 
 Two conformance levels:
 
-- **Portable** -- the full native language (§1–4, §6 minus the Lua-specific
+- **Portable** -- the full native language (§1-4, §6 minus the Lua-specific
   sandbox rules) with `script {}` unsupported.
 - **Full** -- Portable plus `script {}`, requiring an embedded Lua VM in the
   implementation's own language runtime (e.g. a pure-Go Lua VM for
