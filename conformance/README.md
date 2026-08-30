@@ -133,18 +133,27 @@ parse these strings with each implementation's own exact `Int`/`Float`
 parsing (whatever satisfies §2's exact-representation contract), not a
 generic JSON-number decode.
 
-**Value comparison is semantic, not textual.** A test harness decodes
-`expect` into the implementation's native value representation and
-compares it against the actual evaluation result using the value-equality
-rules in §2 — it does not byte-compare JSON or require one canonical
-string spelling per float. This is why ordinary floats need no special
-canonical form (`"2"`, `"2.0"`, and `"2.0e0"` are all fine spellings of
-the same value) — **except** the three special tokens `"nan"`, `"inf"`,
-`"-inf"`, which are fixed and case-sensitive precisely because native
-float parsers disagree on this spelling (JavaScript's `parseFloat`
-accepts `"Infinity"` but not `"inf"`, for example) — a harness or adapter
-MUST special-case exactly these three tokens rather than hand them to a
-generic string-to-float parser.
+**Value comparison is semantic, not textual — and it is fixture-assertion
+equality, not §2's runtime `==`.** A test harness decodes `expect` into
+the implementation's native value representation and structurally
+compares it against the actual evaluation result. This is *not* the same
+relation as §2's `==` operator: §2 deliberately defines `NaN` as unequal
+to everything, including itself (matching Lua/IEEE-754), because that's
+the right behavior for a Scorium program comparing two runtime values.
+But a fixture asserting "evaluating this produced `NaN`" needs "did I get
+the value I expected" — under which a `NaN` expectation MUST match a
+`NaN` result. A harness that reused `==` verbatim for fixture assertions
+could never write a passing `NaN`-producing fixture at all. So: ordinary
+values compare equal exactly when §2's `==` says so; `NaN`-to-`NaN` is the
+one deliberate exception, always a match for fixture purposes.
+
+This is also why ordinary floats need no special canonical form (`"2"`,
+`"2.0"`, and `"2.0e0"` are all fine spellings of the same value) — except
+the three special tokens `"nan"`, `"inf"`, `"-inf"`, fixed and
+case-sensitive precisely because native float parsers disagree on this
+spelling (JavaScript's `parseFloat` accepts `"Infinity"` but not `"inf"`,
+for example) — a harness or adapter MUST special-case exactly these three
+tokens rather than hand them to a generic string-to-float parser.
 
 ## Entries: the shape of a whole evaluated document
 
