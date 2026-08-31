@@ -43,15 +43,29 @@ Delivered with high-level file and source loaders in all three ports.
   return both the native document and evaluated entries.
 - Lower-level parse, evaluate, schema, and format APIs remain available.
 - Safe include and sandbox defaults apply without host boilerplate.
+- All three ports also accept a host-supplied `IncludeResolver` that
+  overrides filesystem-backed `include` resolution entirely, for content
+  addressed by URL, stored in a database, or held as unsaved editor
+  buffers. Built ahead of a concrete consumer, on explicit request rather
+  than observed friction -- an exception to this roadmap's own
+  evidence-first default, not a new default way of working.
 
 ## 5. Put diagnostics in the editor
 
 Delivered first as the Rust `scorium-lsp` executable.
 
 - Live syntax diagnostics use stable Scorium codes and UTF-16 ranges.
+- Once syntax is valid, evaluation runs too (no host functions/values, no
+  application schema), catching undefined interpolation, unknown
+  functions, division by zero, include failures, sandbox-limit overruns,
+  and `script {}` bodies through the same sandboxed Lua state
+  `scorium`/`scorium-lua` hosts use.
 - Whole-document formatting uses the canonical formatter.
-- Editing does not execute includes, control flow, host functions, or Lua.
-  Runtime and application-schema checks remain explicit host operations.
+- Host-schema-aware diagnostics were deliberately not added: there is no
+  schema description format for a generic editor server to load without
+  recreating exactly the schema-language problem this project has
+  declined to solve speculatively (`scorium-schema`'s own doc comment).
+  Application-schema checks remain an explicit host operation.
 
 One language server serves `.scor` files produced by any host. Duplicating an
 LSP per implementation would create drift without improving user behavior.
@@ -69,9 +83,10 @@ Delivered through AquaTTY.
 
 ## What comes next
 
-Future work must start from observed friction in editors and host applications.
-The current candidates are schema-aware editor diagnostics, host-controlled
-include resolvers for asynchronous or virtual filesystems, and clearer API
-migration guidance before 1.0. New syntax, a schema language, generic
+`IncludeResolver` and `docs/API_STABILITY.md` (stability tiers, deprecation
+policy, upgrade guidance) landed in all three ports; `scorium-lsp` gained
+evaluation diagnostics without inventing a schema description format. Future
+work should still start from observed friction in editors and host
+applications, not from this list. New syntax, a schema language, generic
 iteration, and extra runtime capabilities remain deferred until a real user
 workflow cannot be handled cleanly by Scorium's existing model.
