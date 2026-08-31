@@ -1,7 +1,7 @@
 # 7. Conformance levels
 
 **Status: informative proposal only. It is not part of stable language
-version `0.2.0` and does not define a conformance claim.**
+version `0.2.1` and does not define a conformance claim.**
 
 This section records a design discussed for making Scorium portable to
 languages without a practical embedded-Lua story, without inventing a
@@ -29,7 +29,7 @@ Two conformance levels:
   `scorium-rs`'s Lua integration.
 
 Under this proposal, an implementation would declare which level it claims.
-The stable `0.2.0` rule already requires an implementation without Lua
+The stable `0.2.1` rule already requires an implementation without Lua
 execution to raise `scorium::eval::script_error` when evaluation reaches a
 script block; it may not skip the block or treat it as inert (§1, §3, §5).
 

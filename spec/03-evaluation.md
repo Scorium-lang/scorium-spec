@@ -1,6 +1,6 @@
 # 3. Evaluation rules
 
-**Status: stable and normative for language version `0.2.0`. Lua's own
+**Status: stable and normative for language version `0.2.1`. Lua's own
 semantics are out of scope; the `script {}` boundary is specified below.
 Derived from `scorium-rs` and cross-checked against `scorium-js`.**
 

@@ -6,6 +6,19 @@ own package-version changelog.
 
 ## [Unreleased]
 
+- Added tooling contract v1 for CLI exit status, machine diagnostics, and the
+  portable syntax-tree encoding.
+- Replaced the feature-count roadmap with six delivered user workflows and
+  evidence gates for future work.
+
+## [0.2.1] - 2026-08-31
+
+Behavior-preserving portability release. Expanded the conformance corpus to
+cover previously unexercised diagnostics, include policy, explicit Lua and
+non-Lua capability paths, and the shared schema-validation surface. Added
+capability exclusions and deterministic schema diagnostic ordering. No valid
+`0.2.0` program changes meaning in `0.2.1`.
+
 ## [0.2.0] - 2026-08-30
 
 First stable language specification. Sections `00`-`06` are normative for
@@ -42,3 +55,4 @@ the current `scorium-rs` documentation (`docs/GRAMMAR.md`,
 source material, not as authoritative text.
 
 [0.2.0]: https://github.com/Scorium-lang/scorium-spec/releases/tag/v0.2.0
+[0.2.1]: https://github.com/Scorium-lang/scorium-spec/releases/tag/v0.2.1

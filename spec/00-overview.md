@@ -1,6 +1,6 @@
 # 0. Overview
 
-**Status: stable and normative for language version `0.2.0`, except where a
+**Status: stable and normative for language version `0.2.1`, except where a
 section is explicitly marked informative or out of scope.**
 
 ## Purpose
@@ -32,7 +32,7 @@ native evaluation model in §3
 "becomes programmable" half of the core value proposition, and every
 implementation gets it natively, in its own language, with no embedded
 VM required. Raw `script {}` (Lua, §6) is an escape hatch beyond that --
-useful, but an optional execution capability in version `0.2.0`. An
+useful, but an optional execution capability in version `0.2.1`. An
 implementation without Lua execution has still delivered the actual design
 principle above, not a crippled placeholder waiting for Lua support. Language
 work (spec sections, conformance fixtures, implementation priority) should
@@ -41,11 +41,11 @@ raw scripting as the feature the rest of the language merely leads up to.
 
 ## Authority and normative scope
 
-Sections 0-6 are the language contract for `0.2.0`. Statements using
+Sections 0-6 are the language contract for `0.2.1`. Statements using
 **MUST**, **MUST NOT**, **SHOULD**, or **MAY** are normative. Rationale,
 implementation examples, roadmap notes, and text explicitly labelled
 informative are not normative. Section 7 is an informative proposal and is
-not part of `0.2.0` conformance.
+not part of `0.2.1` conformance.
 
 No host-language implementation is the reference or authority for Scorium.
 This versioned specification and its conformance fixtures define the shared
@@ -57,7 +57,7 @@ silently copy a different behavior.
 
 Language versions use Semantic Versioning independently of implementation
 package versions. For example, `scorium-rs` 0.1.1 may implement language
-version `0.2.0`.
+version `0.2.1`.
 
 Before language version 1.0, a minor version MAY make incompatible language
 changes. A patch version MUST preserve valid programs and their observable
@@ -67,4 +67,4 @@ and new fixtures for already-required behavior normally use a patch version.
 
 Changes are proposed and reviewed through GitHub issues and pull requests as
 described in `CONTRIBUTING.md`. A separate RFC document format is not required
-for `0.2.0`; a future process change does not alter this language version.
+for `0.2.1`; a future process change does not alter this language version.

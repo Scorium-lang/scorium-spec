@@ -1,6 +1,6 @@
 # 2. Value semantics
 
-**Status: stable and normative for language version `0.2.0`.
+**Status: stable and normative for language version `0.2.1`.
 Derived from `scorium-rs`'s `Value` type and evaluator
 (`crates/scorium-core/src/value.rs`, `crates/scorium-lua/src/eval.rs`).**
 
@@ -17,7 +17,7 @@ Value ::= Int(i64-range integer)
         | List(Value*)
 ```
 
-Eight value types, no others, for `0.2.0`. An implementation MUST
+Eight value types, no others, for `0.2.1`. An implementation MUST
 keep `Int` and `Float` distinct representations -- collapsing both into one
 numeric type (as a prototype implementation might, for convenience) is a
 non-conformant simplification, because it silently changes arithmetic and
@@ -151,7 +151,7 @@ not their language default.
 
 Calling any other method name on a color, or calling a color method with
 the wrong argument count/type, MUST raise `scorium::eval::type_error`.
-No other value type has methods in `0.2.0`.
+No other value type has methods in `0.2.1`.
 
 ## Duration semantics
 

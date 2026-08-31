@@ -1,12 +1,12 @@
 # 4. Canonical formatter behavior
 
-**Status: stable and normative for language version `0.2.0` for
+**Status: stable and normative for language version `0.2.1` for
 any implementation that claims to provide `fmt`. Derived from
 `crates/scorium-format/src/printer.rs`.**
 
 ## Whether formatting is required
 
-Providing a formatter is optional in language version `0.2.0`. An
+Providing a formatter is optional in language version `0.2.1`. An
 implementation that exposes `fmt`, `format`, or an equivalent formatter API
 MUST follow this entire section and the formatter fixtures.
 
@@ -83,7 +83,7 @@ MUST follow this entire section and the formatter fixtures.
   print their literal parts verbatim and re-emit `$name` for each
   interpolation part.
 - Lists print as `[a, b, c]` -- comma-space separated, no trailing comma.
-- Version `0.2.0` performs no automatic line wrapping for any construct,
+- Version `0.2.1` performs no automatic line wrapping for any construct,
   regardless of line length.
 
 ## Idempotency requirement
@@ -123,5 +123,5 @@ specifically to catch and prevent per-implementation formatting drift.
 ## Version scope
 
 Future language versions MAY introduce an explicit wrapping option. Such an
-option cannot change the default `0.2.0` output retroactively and requires
+option cannot change the default `0.2.1` output retroactively and requires
 versioned conformance fixtures before it becomes normative.

@@ -26,15 +26,28 @@ FIXTURE_CATEGORIES = {
     "formatter",
     "grammar",
     "sandbox",
+    "schema",
     "values",
 }
 VALUE_TYPES = {"int", "float", "bool", "nil", "string", "color", "duration", "list"}
 RUNTIME_OPTIONS = {
+    "allow_parent_traversal",
+    "includes_enabled",
     "max_loop_iterations",
     "max_function_call_depth",
     "max_script_instructions",
     "max_script_memory_bytes",
 }
+SCHEMA_BUILTIN_TYPES = {
+    "any",
+    "boolean",
+    "color",
+    "duration",
+    "float",
+    "integer",
+    "string",
+}
+SCHEMA_DUPLICATE_POLICIES = {"error", "first-wins", "last-wins"}
 
 errors: list[str] = []
 
@@ -152,6 +165,123 @@ def validate_entry(path: Path, entry: object, context: str) -> None:
         error(path, f"{context}.kind is not leaf, node, or include")
 
 
+def validate_schema_value_type(path: Path, value: object, context: str) -> None:
+    if isinstance(value, str):
+        if value not in SCHEMA_BUILTIN_TYPES:
+            error(path, f"{context} is not a recognized schema value type")
+        return
+    if not isinstance(value, dict) or set(value) != {"list"}:
+        error(path, f"{context} must be a built-in type string or {{\"list\": <type>}}")
+        return
+    validate_schema_value_type(path, value["list"], f"{context}.list")
+
+
+def validate_schema_key(path: Path, value: object, context: str) -> None:
+    if not isinstance(value, dict):
+        error(path, f"{context} must be an object")
+        return
+    require_keys(path, value, {"type", "required"}, context)
+    validate_schema_value_type(path, value.get("type"), f"{context}.type")
+    if type(value.get("required")) is not bool:
+        error(path, f"{context}.required must be a boolean")
+
+
+def validate_schema_node(path: Path, value: object, context: str) -> None:
+    if not isinstance(value, dict):
+        error(path, f"{context} must be an object")
+        return
+    allowed = {"keys", "nodes", "allow_unknown_keys", "duplicate_key_policy", "allowed_headers"}
+    unknown = set(value) - allowed
+    if unknown:
+        error(path, f"{context} has unknown keys: {sorted(unknown)}")
+    keys = value.get("keys", {})
+    if not isinstance(keys, dict):
+        error(path, f"{context}.keys must be an object")
+    else:
+        for name, key in keys.items():
+            if not isinstance(name, str) or not name:
+                error(path, f"{context}.keys names must be non-empty strings")
+            validate_schema_key(path, key, f"{context}.keys[{name!r}]")
+    nodes = value.get("nodes", {})
+    if not isinstance(nodes, dict):
+        error(path, f"{context}.nodes must be an object")
+    else:
+        for name, node in nodes.items():
+            if not isinstance(name, str) or not name:
+                error(path, f"{context}.nodes names must be non-empty strings")
+            validate_schema_node(path, node, f"{context}.nodes[{name!r}]")
+    allow_unknown = value.get("allow_unknown_keys", False)
+    if type(allow_unknown) is not bool:
+        error(path, f"{context}.allow_unknown_keys must be a boolean")
+    duplicate_policy = value.get("duplicate_key_policy", "error")
+    if duplicate_policy not in SCHEMA_DUPLICATE_POLICIES:
+        error(path, f"{context}.duplicate_key_policy is not recognized")
+    allowed_headers = value.get("allowed_headers")
+    if allowed_headers is not None and (
+        not isinstance(allowed_headers, list)
+        or not all(header is None or isinstance(header, str) for header in allowed_headers)
+        or len({repr(header) for header in allowed_headers}) != len(allowed_headers)
+    ):
+        error(path, f"{context}.allowed_headers must be an array of unique strings or null")
+
+
+def validate_schema_fixture(path: Path, fixture: dict[str, object], name: str | None) -> str | None:
+    allowed = {"name", "source", "schema", "expect_valid", "expect_errors", "requires", "excludes"}
+    unknown = set(fixture) - allowed
+    if unknown:
+        error(path, f"schema fixture has unknown keys: {sorted(unknown)}")
+    if not isinstance(fixture.get("source"), str):
+        error(path, "source must be a string")
+    schema = fixture.get("schema")
+    if not isinstance(schema, dict):
+        error(path, "schema must be an object")
+    else:
+        allowed_schema = {"root_keys", "nodes", "allow_unknown_nodes"}
+        unknown_schema = set(schema) - allowed_schema
+        if unknown_schema:
+            error(path, f"schema has unknown keys: {sorted(unknown_schema)}")
+        root_keys = schema.get("root_keys", {})
+        if not isinstance(root_keys, dict):
+            error(path, "schema.root_keys must be an object")
+        else:
+            for key_name, key in root_keys.items():
+                validate_schema_key(path, key, f"schema.root_keys[{key_name!r}]")
+        nodes = schema.get("nodes", {})
+        if not isinstance(nodes, dict):
+            error(path, "schema.nodes must be an object")
+        else:
+            for node_name, node in nodes.items():
+                validate_schema_node(path, node, f"schema.nodes[{node_name!r}]")
+        if type(schema.get("allow_unknown_nodes", False)) is not bool:
+            error(path, "schema.allow_unknown_nodes must be a boolean")
+    has_valid = "expect_valid" in fixture
+    has_errors = "expect_errors" in fixture
+    if has_valid == has_errors:
+        error(path, "use exactly one of expect_valid or expect_errors")
+    elif has_valid and fixture.get("expect_valid") is not True:
+        error(path, "expect_valid must be true")
+    elif has_errors:
+        expected = fixture.get("expect_errors")
+        if not isinstance(expected, list) or not expected:
+            error(path, "expect_errors must be a non-empty array")
+        else:
+            for index, item in enumerate(expected):
+                if not isinstance(item, dict):
+                    error(path, f"expect_errors[{index}] must be an object")
+                    continue
+                allowed_error = {"code", "node", "key", "suggestion"}
+                unknown_error = set(item) - allowed_error
+                if unknown_error:
+                    error(path, f"expect_errors[{index}] has unknown keys: {sorted(unknown_error)}")
+                code = item.get("code")
+                if not isinstance(code, str) or not code.startswith("scorium::schema::"):
+                    error(path, f"expect_errors[{index}].code must be a schema diagnostic code")
+                for field in ("node", "key", "suggestion"):
+                    if field in item and not isinstance(item[field], str):
+                        error(path, f"expect_errors[{index}].{field} must be a string")
+    return name
+
+
 def validate_fixture(path: Path, fixture: object) -> str | None:
     if not isinstance(fixture, dict):
         error(path, "fixture root must be an object")
@@ -169,10 +299,21 @@ def validate_fixture(path: Path, fixture: object) -> str | None:
         or len(set(requires)) != len(requires)
     ):
         error(path, "requires must be an array of unique, non-empty strings")
+    excludes = fixture.get("excludes")
+    if excludes is not None and (
+        not isinstance(excludes, list)
+        or not all(isinstance(item, str) and item for item in excludes)
+        or len(set(excludes)) != len(excludes)
+    ):
+        error(path, "excludes must be an array of unique, non-empty strings")
+    if isinstance(requires, list) and isinstance(excludes, list) and set(requires) & set(excludes):
+        error(path, "a capability cannot appear in both requires and excludes")
 
     category = path.parent.name
+    if category == "schema":
+        return validate_schema_fixture(path, fixture, name)
     if category == "formatter":
-        allowed = {"name", "input", "output", "requires"}
+        allowed = {"name", "input", "output", "requires", "excludes"}
         unknown = set(fixture) - allowed
         if unknown:
             error(path, f"formatter fixture has unknown keys: {sorted(unknown)}")
@@ -181,7 +322,7 @@ def validate_fixture(path: Path, fixture: object) -> str | None:
                 error(path, f"{field} must be a string")
         return name
 
-    allowed = {"name", "source", "files", "entry", "expect", "expect_error", "requires", "options"}
+    allowed = {"name", "source", "files", "entry", "expect", "expect_error", "requires", "excludes", "options"}
     unknown = set(fixture) - allowed
     if unknown:
         error(path, f"fixture has unknown keys: {sorted(unknown)}")
@@ -195,6 +336,10 @@ def validate_fixture(path: Path, fixture: object) -> str | None:
             if unknown_options:
                 error(path, f"options has unknown keys: {sorted(unknown_options)}")
             for option, value in options.items():
+                if option in {"allow_parent_traversal", "includes_enabled"}:
+                    if type(value) is not bool:
+                        error(path, f"options.{option} must be a boolean")
+                    continue
                 minimum = 0 if option == "max_script_memory_bytes" else 1
                 if type(value) is not int or value < minimum:
                     error(path, f"options.{option} must be an integer >= {minimum}")

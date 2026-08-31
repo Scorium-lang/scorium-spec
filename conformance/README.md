@@ -1,7 +1,7 @@
 # Conformance fixtures
 
-**Status: stable schema for language version `0.2.0`. The corpus contains
-34 fixtures under `v0.2.0/`, grounded in verified implementation behavior
+**Status: stable schema for language version `0.2.1`. The corpus contains
+56 fixtures under `v0.2.1/`, grounded in verified implementation behavior
 and the normative decisions recorded by this specification.**
 
 ## Intent
@@ -74,12 +74,14 @@ the limits needed by that fixture:
 }
 ```
 
-Recognized keys are `max_loop_iterations`, `max_function_call_depth`,
-`max_script_instructions`, and `max_script_memory_bytes`. Values are
-non-negative JSON integers; all except `max_script_memory_bytes` MUST be
-greater than zero. An omitted key uses the implementation's default. This
-keeps limit fixtures fast and deterministic without making implementation
-defaults part of the language contract.
+Recognized keys are `includes_enabled`, `allow_parent_traversal`,
+`max_loop_iterations`, `max_function_call_depth`, `max_script_instructions`,
+and `max_script_memory_bytes`. The include-policy keys are booleans. Limit
+values are non-negative JSON integers; all except
+`max_script_memory_bytes` MUST be greater than zero. An omitted key uses the
+implementation's default. This keeps policy and limit fixtures fast and
+deterministic without making implementation defaults part of the language
+contract.
 
 ### Diagnostics fixtures
 
@@ -112,13 +114,26 @@ byte-identity check, not a semantic-value check:
 implementation's `fmt`, and re-formatting `output` MUST reproduce it
 exactly (idempotency, §4).
 
-### The `requires` escape hatch
+### Schema fixtures
+
+The `schema/` category exercises the shared post-evaluation schema behavior
+without defining a public schema-file language. Its `schema` object is a
+fixture-adapter description limited to built-in value types, nested nodes,
+required keys, unknown-name policy, duplicate policy, and an allow-list for
+node headers. Each implementation translates that description into its
+idiomatic schema builder API, evaluates `source`, and compares the ordered
+diagnostic fields in `expect_errors`. Host-defined custom validators remain
+ordinary embedding APIs and are not serialized into this test format.
+
+### The `requires` and `excludes` escape hatches
 
 Any fixture MAY carry `"requires": ["lua"]` (default: absent, meaning "no
 implementation-capability requirement"). This allows a Lua-dependent fixture
 to declare its capability without baking Section 7's unapproved level names
-into the schema. No `0.2.0` fixture uses it; the current corpus tests the
-language core available without Lua execution.
+into the schema. Conversely, `"excludes": ["lua"]` selects the required
+unsupported-capability behavior, such as the explicit `script_error` a
+non-Lua implementation must raise. An implementation skips a fixture when it
+lacks a required capability or has an excluded capability.
 
 ## Tagged value encoding
 
@@ -210,14 +225,16 @@ So a whole-document (or whole-node-body) result is its own tagged form,
 
 `header` is `null` when the node has none, otherwise the header string.
 
-## Version 0.2.0 corpus scope
+## Version 0.2.1 corpus scope
 
-The `0.2.0` corpus covers pure-language parsing, evaluation, diagnostics,
-formatting, and sandbox limits. Host-integration calls and their
+The `0.2.1` corpus covers pure-language parsing, evaluation, diagnostics,
+formatting, sandbox limits, and the common schema-validation surface.
+Host-integration calls and their
 implementation-specific result entries are outside this corpus version, so
 no `hostcall` entry encoding is defined. A future language version MAY add a
 separate host-integration fixture category without changing the meaning of
-the `0.2.0` fixtures.
+the `0.2.1` fixtures.
 
-Capability requirements remain a string list rather than named conformance
-levels. Section 7 is informative and cannot change how `requires` is decoded.
+Capability filters remain string lists rather than named conformance levels.
+Section 7 is informative and cannot change how `requires` or `excludes` are
+decoded.

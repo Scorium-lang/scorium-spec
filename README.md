@@ -1,7 +1,7 @@
 # Scorium language specification
 
 [![CI](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml/badge.svg)](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml)
-[![Language version](https://img.shields.io/badge/language-0.2.0-8EDDFF?style=flat-square)](./VERSION)
+[![Language version](https://img.shields.io/badge/language-0.2.1-8EDDFF?style=flat-square)](./VERSION)
 [![Status](https://img.shields.io/badge/status-stable%20pre--1.0-8EDDFF?style=flat-square)](./CHANGELOG.md)
 [![Source Available](https://img.shields.io/badge/source-available-8EDDFF?style=flat-square)](./LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/Scorium-lang/scorium-spec?style=flat-square&logo=github)](https://github.com/Scorium-lang/scorium-spec/stargazers)
@@ -38,17 +38,19 @@ end
 
 ## Status
 
-The current language version is **`0.2.0`**. Sections 0–6 are stable and
+The current language version is **`0.2.1`**. Sections 0–6 are stable and
 normative for that version, with behavior verified independently by the Rust
 and TypeScript/JavaScript implementations. Section 7 is an informative,
 unapproved proposal and is not part of the language contract.
 
-The repository contains **34 conformance fixtures** across values,
-evaluation, diagnostics, formatting, and sandbox behavior. Scorium remains
+The repository contains **56 conformance fixtures** across values,
+evaluation, diagnostics, formatting, sandbox, and schema behavior. Scorium remains
 pre-1.0, so a future minor language version may make incompatible changes;
-version `0.2.0` itself is no longer a draft.
+version `0.2.1` itself is no longer a draft.
 
 ## Specification
+
+- [Roadmap](./ROADMAP.md)
 
 - [Overview and design principle](./spec/00-overview.md)
 - [Lexical structure and grammar](./spec/01-lexical-and-grammar.md)
@@ -71,6 +73,9 @@ See [the conformance format](./conformance/README.md) before implementing a
 harness or contributing a fixture. Compatibility comes from these fixtures,
 not from implementations sharing source code or release schedules.
 
+The versioned [`tooling` contract](./tooling/README.md) separately defines
+portable command-line JSON and exit behavior.
+
 ## Implementations
 
 Scorium belongs to no single host language. Every implementation is a peer:
@@ -81,15 +86,18 @@ fixtures, and exposes APIs suited to its own ecosystem.
   implementation, including the Lua execution surface.
 - [`scorium-js`](https://github.com/Scorium-lang/scorium-js) -- native
   TypeScript/JavaScript implementation of the non-Lua language core.
+- [`scorium-go`](https://github.com/Scorium-lang/scorium-go) -- native Go
+  implementation of the non-Lua language core.
 
 An implementation version and a language version are separate. For example,
 an implementation may release version `0.9.0` while declaring support for
-language version `0.2.0`.
+language version `0.2.1`.
 
 ## Repository layout
 
 - `spec/` -- one specification document per language concern.
 - `conformance/` -- fixture format and versioned fixture corpora.
+- `tooling/` -- cross-port CLI and portable syntax-tree contract.
 - `VERSION` -- current language version.
 - `CHANGELOG.md` -- language-version history.
 

@@ -1,6 +1,6 @@
 # 6. Sandbox and security rules
 
-**Status: stable and normative for language version `0.2.0`.
+**Status: stable and normative for language version `0.2.1`.
 Derived from `crates/scorium-lua/src/runtime.rs`.**
 
 ## Resource limits
@@ -23,7 +23,7 @@ the full statement of what's normative (the limit's existence,
 configurability, and error path) versus what's an implementation choice
 (the default value). A future named **compatibility profile** could pin
 these defaults for cross-implementation comparison, but no such profile
-is defined in `0.2.0`.
+is defined in `0.2.1`.
 
 ## Lua sandbox scope
 
@@ -94,4 +94,4 @@ the reference for the algorithm.
 An implementation without `script {}` execution has no Lua sandbox surface,
 but still owns every other rule in this section. Include path policy, loop
 budget, and function-call depth are language-core requirements. Section 7's
-possible conformance-level names do not change the `0.2.0` requirements.
+possible conformance-level names do not change the `0.2.1` requirements.

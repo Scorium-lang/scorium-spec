@@ -1,6 +1,6 @@
 # 5. Diagnostic model
 
-**Status: stable for language version `0.2.0`. The code catalog and minimum
+**Status: stable for language version `0.2.1`. The code catalog and minimum
 structure below are normative; message text and rendering are not. Derived
 from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
 `crates/scorium-lua/src/error.rs` (eval), and
@@ -17,7 +17,7 @@ from `crates/scorium-core/src/diagnostic.rs` (lex/parse),
   translate message text, as long as the code and the required structured
   fields (below) are present.
 - Fields beyond the minimum structure below, such as `name` and
-  `suggestion`, are optional implementation metadata in `0.2.0` unless the
+  `suggestion`, are optional implementation metadata in `0.2.1` unless the
   code catalog explicitly requires them.
 
 ## Required structure
@@ -39,7 +39,7 @@ MUST raise a diagnostic with a defined code. Silently
 ignoring, no-op'ing, or best-effort-guessing a value for an unsupported
 construct is non-conformant regardless of how reasonable the guess is.
 
-## Code catalog (language version `0.2.0`)
+## Code catalog (language version `0.2.1`)
 
 ### `scorium::lex::*`
 
@@ -102,7 +102,7 @@ but never raised. This is not
 two distinct real conditions, just one live diagnostic and one vestigial
 duplicate.
 
-**Normative for `0.2.0`: `scorium::eval::include_cycle` is the only
+**Normative for `0.2.1`: `scorium::eval::include_cycle` is the only
 include-cycle code.** `scorium::include::cycle` MUST NOT be treated as
 part of the spec -- a new implementation should not invent a
 parse-time-vs-eval-time distinction here that doesn't actually exist in
@@ -115,5 +115,5 @@ concern, and out of scope for this specification version.)
 
 Implementations MAY localize diagnostic messages and help text. Codes remain
 ASCII and stable across locales. Additional structured fields are encouraged
-for tooling but are not cross-language conformance requirements in `0.2.0`,
+for tooling but are not cross-language conformance requirements in `0.2.1`,
 except that `duplicate_key` carries both relevant spans as stated above.
