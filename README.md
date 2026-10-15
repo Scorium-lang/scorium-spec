@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="assets/brand/lockup-light.svg">
+    <img src="assets/brand/lockup.svg" alt="Scorium - Language specification (no implementation badge)" width="480">
+  </picture>
+</p>
+
 # Scorium language specification
 
 [![CI](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml/badge.svg)](https://github.com/Scorium-lang/scorium-spec/actions/workflows/ci.yml)
@@ -109,6 +116,12 @@ runtime of its own to secure. Report security-sensitive specification flaws
 privately as described in [SECURITY.md](./SECURITY.md).
 
 ## Licensing
+
+Logos and hero artwork by [Fi3w0](https://github.com/Fi3w0) are licensed
+separately under [Creative Commons Attribution-NonCommercial-ShareAlike
+4.0 International](./assets/brand/LICENSE) (CC BY-NC-SA 4.0). See the
+[brand assets](./assets/brand/README.md) for variants and attribution.
+This artwork license does not apply to implementation code or specification text.
 
 Scorium is **source-available** under the
 [PolyForm Strict License 1.0.0](./LICENSE). It is free for personal,

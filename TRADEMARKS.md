@@ -10,9 +10,11 @@ command-line tool name, the `scorium-*` package names, and any related names,
 logos, wordmarks, and visual identity (collectively, the "Scorium Marks") are
 controlled by **@fi3w0**.
 
-The Scorium Marks identify the official Scorium project. They are not licensed
-for unrestricted use by the PolyForm Strict License or by any noncommercial
-permission granted in this repository.
+The Scorium Marks identify the official Scorium project. The PolyForm Strict
+software license does not grant trademark rights. Copyright in logo and hero
+artwork is licensed separately under
+[CC BY-NC-SA 4.0](./assets/brand/LICENSE); that artwork license does not grant
+trademark rights.
 
 ## What you may do
 
@@ -48,10 +50,11 @@ publications. Anything else is unofficial.
 
 ## Branding direction
 
-Scorium uses a clean, scientific/material identity. The name is deliberately
-neutral and is not water-, fantasy-, or application-themed. Placeholder
-branding direction only is provided in the documentation; do not treat it as
-a final logo or visual standard.
+Scorium uses a volcanic identity inspired by scoria: a molten-orange `Sco`
+tile with the number 56. Implementation logos carry the matching host-language
+badge; the language specification uses the untagged mark. See the
+[brand assets](./assets/brand/README.md) for the logo variants and artwork
+attribution.
 
 ## Contact
 
