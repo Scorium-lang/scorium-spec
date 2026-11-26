@@ -95,6 +95,9 @@ fixtures, and exposes APIs suited to its own ecosystem.
   TypeScript/JavaScript implementation of the non-Lua language core.
 - [`scorium-go`](https://github.com/Scorium-lang/scorium-go) -- native Go
   implementation of the non-Lua language core.
+- [`scorium-jvm`](https://github.com/Scorium-lang/scorium-jvm) -- native JVM
+  implementation (a Java core with a Kotlin-friendly API) of the non-Lua
+  language core.
 
 An implementation version and a language version are separate. For example,
 an implementation may release version `0.9.0` while declaring support for
